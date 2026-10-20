@@ -12,6 +12,18 @@ Aplicativo web estático para identificar moods, selecionar estratégias de prep
 - Calendário, feedback, seleção de duração e contraste dos temas foram ajustados para celular.
 - O botão flutuante de temas foi removido; a paleta continua na página inicial.
 
+## Temas desta versão
+
+- **Azul Clássico** — claro
+- **Ônix Dourado** — escuro
+- **Grafite** — escuro
+- **Preto Absoluto** — escuro
+- **Verde Floresta** — escuro
+- **Vinho Profundo** — escuro
+- **Azul Noturno** — escuro
+
+**Ametista, Âmbar e Sálvia foram retirados.** O usuário que tinha um dos três selecionados será direcionado ao Ônix Dourado ao atualizar, sem perder registros ou personalizações. O mesmo vale para backups antigos restaurados que mencionem esses temas.
+
 ## Outras características
 
 - visual refinado, com aparência mais premium;

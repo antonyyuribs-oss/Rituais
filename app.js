@@ -3,12 +3,13 @@
 const STORAGE_KEY = 'rituais_app_v3';
 const LEGACY_STORAGE_KEY = 'atividades_moods_app_v2';
 const THEME_PRESETS = [
-  {id:'classico', name:'Azul Clássico', desc:'elegante e sereno', themeColor:'#1f3656', swatch:['#2f5f9f','#8fc3ff','#d7e8ff']},
-  {id:'onyx', name:'Ônix Dourado', desc:'escuro e sofisticado', themeColor:'#151a22', swatch:['#d4b46e','#f1d69a','#2a3445']},
-  {id:'sage', name:'Sálvia', desc:'calmo e orgânico', themeColor:'#4f7d68', swatch:['#4f7d68','#a7ceb8','#e3f0e8']},
-  {id:'ametista', name:'Ametista', desc:'refinado e criativo', themeColor:'#7155b6', swatch:['#7155b6','#c7b7f2','#efeaff']},
-  {id:'ember', name:'Âmbar', desc:'quente e acolhedor', themeColor:'#b15d3d', swatch:['#b15d3d','#f0bea8','#fff1e8']},
-  {id:'grafite', name:'Grafite', desc:'moderno e sóbrio', themeColor:'#1d232c', swatch:['#7ca6de','#cfe0fa','#2b3444']}
+  {id:'classico', name:'Azul Clássico', desc:'claro e elegante', themeColor:'#1f3656', swatch:['#2f5f9f','#8fc3ff','#d7e8ff']},
+  {id:'onyx', name:'Ônix Dourado', desc:'escuro com detalhes dourados', themeColor:'#151a22', swatch:['#d4b46e','#f1d69a','#2a3445']},
+  {id:'grafite', name:'Grafite', desc:'escuro com azul metálico', themeColor:'#1d232c', swatch:['#7ca6de','#cfe0fa','#2b3444']},
+  {id:'preto', name:'Preto Absoluto', desc:'preto intenso e minimalista', themeColor:'#050507', swatch:['#08090c','#d8dce7','#34373f']},
+  {id:'floresta', name:'Verde Floresta', desc:'verde profundo e natural', themeColor:'#0b1713', swatch:['#173629','#88c7a5','#294f3d']},
+  {id:'vinho', name:'Vinho Profundo', desc:'vinho escuro e sofisticado', themeColor:'#201118', swatch:['#41202f','#daaac0','#542738']},
+  {id:'noturno', name:'Azul Noturno', desc:'azul-marinho profundo', themeColor:'#0a1328', swatch:['#0a1836','#85b5ff','#234478']}
 ];
 const ACTIVITIES = [
   {id:'work', name:'Trabalho Matutino', icon:'scale', question:'Conseguiu trabalhar pela manhã?'},
@@ -107,7 +108,7 @@ try{
   if(!db||db.schemaVersion!==2||!Array.isArray(db.records)||!Array.isArray(db.strategies)||!db.moods) throw new Error('invalid');
 }catch(e){db=seedData();storageFault=true;}
 if(!db.settings||typeof db.settings!=='object') db.settings={theme:'classico'};
-if(!THEME_PRESETS.some(t=>t.id===db.settings.theme)) db.settings.theme='classico';
+if(!THEME_PRESETS.some(t=>t.id===db.settings.theme)) db.settings.theme='onyx';
 const today=nowLocal();
 const ui={view:'home',recordId:null,historyYear:Number(today.date.slice(0,4)),historyMonth:Number(today.date.slice(5,7))-1,historyDay:null,addMood:false,editMoodId:null,addingStrategy:false,editStrategyId:null,managerFilter:'all',feedbackExpanded:false,retroDate:null,retro:false};
 const main=document.getElementById('main');const navigation=document.getElementById('navigation');const themeModal=document.getElementById('theme-modal');const themeBackdrop=document.getElementById('theme-backdrop');const themeOptions=document.getElementById('theme-options');const themeClose=document.getElementById('theme-close');let toastTimer;let themeOpener=null;
@@ -254,7 +255,7 @@ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!themeModal
 const fileInput=document.getElementById('import-file');
 fileInput.addEventListener('change',async event=>{const file=event.target.files?.[0];fileInput.value='';if(!file)return;if(file.size>8*1024*1024){toast('O arquivo é grande demais para restaurar aqui.');return;}
  try{const content=JSON.parse(await file.text());if(content.type!=='backup'||content.schemaVersion!==2||!content.data)throw new Error('Este arquivo não é um backup completo compatível.');const replacement=content.data;if(replacement.schemaVersion!==2||!Array.isArray(replacement.records)||!Array.isArray(replacement.strategies)||!replacement.moods||ACTIVITIES.some(a=>!Array.isArray(replacement.moods[a.id])))throw new Error('Backup incompleto ou inválido.');if(!window.confirm('Restaurar o backup? Todos os registros e personalizações atuais serão substituídos. Recomenda-se exportar um backup antes.'))return;
- const previous=db;db=replacement;if(!db.settings||typeof db.settings!=='object')db.settings={theme:'classico'};if(!THEME_PRESETS.some(t=>t.id===db.settings.theme))db.settings.theme='classico';if(!persist()){db=previous;throw new Error('Não foi possível gravar os dados restaurados.');}applyTheme();ui.recordId=null;setTab('history');toast('Backup restaurado.');
+ const previous=db;db=replacement;if(!db.settings||typeof db.settings!=='object')db.settings={theme:'classico'};if(!THEME_PRESETS.some(t=>t.id===db.settings.theme))db.settings.theme='onyx';if(!persist()){db=previous;throw new Error('Não foi possível gravar os dados restaurados.');}applyTheme();ui.recordId=null;setTab('history');toast('Backup restaurado.');
  }catch(e){toast(e.message||'Não foi possível ler o backup.');}
 });
 window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY&&event.newValue){try{const fresh=JSON.parse(event.newValue);if(fresh.schemaVersion===2&&Array.isArray(fresh.records)){db=fresh;render();}}catch(e){}}});

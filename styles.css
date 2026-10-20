@@ -55,89 +55,118 @@
   --theme-chip-1:#d4b46e;
   --theme-chip-2:#f1d69a;
 }
-:root[data-theme="sage"]{
-  color-scheme: light;
-  --page:#eef4f1;
-  --page-2:#f8fbf9;
-  --paper:rgba(255,255,255,.82);
-  --paper-strong:#ffffff;
-  --paper-soft:rgba(255,255,255,.58);
-  --tint:#edf5f0;
-  --tint-strong:#dfece4;
-  --ink:#1f312b;
-  --ink-soft:#3f564e;
-  --mute:#70857d;
-  --stroke:rgba(39,82,63,.13);
-  --stroke-strong:rgba(39,82,63,.22);
-  --accent:#4f7d68;
-  --accent-2:#7aa88e;
-  --accent-soft:#d9ece2;
-  --accent-ink:#1e4736;
-  --danger:#a95860;
-  --success:#2d785f;
-  --warning:#aa7e2f;
-  --shadow:0 24px 60px rgba(34,71,55,.11);
-  --shadow-soft:0 16px 40px rgba(34,71,55,.08);
-  --glow: radial-gradient(circle at top left, rgba(122,168,142,.22), transparent 42%), radial-gradient(circle at bottom right, rgba(201,225,213,.35), transparent 34%);
-  --nav-bg:rgba(255,255,255,.76);
-  --theme-chip-1:#4f7d68;
-  --theme-chip-2:#a7ceb8;
+/* Novas paletas escuras: contraste elevado para leitura e interações. */
+:root[data-theme="preto"]{
+  color-scheme:dark;
+  --page:#030304;
+  --page-2:#08090b;
+  --paper:rgba(10,11,13,.94);
+  --paper-strong:#0c0d10;
+  --paper-soft:rgba(17,18,21,.94);
+  --tint:#1b1c20;
+  --tint-strong:#25262c;
+  --ink:#f7f7f9;
+  --ink-soft:#dedee5;
+  --mute:#aaaab6;
+  --stroke:rgba(218,222,233,.17);
+  --stroke-strong:rgba(218,222,233,.30);
+  --accent:#d9dce5;
+  --accent-2:#f0f2f7;
+  --accent-soft:rgba(218,222,233,.15);
+  --accent-ink:#f3f4f7;
+  --danger:#f3a4aa;
+  --success:#96d5b9;
+  --warning:#ebc990;
+  --shadow:0 24px 60px rgba(0,0,0,.58);
+  --shadow-soft:0 16px 42px rgba(0,0,0,.42);
+  --glow:radial-gradient(circle at 90% 8%,rgba(255,255,255,.045),transparent 38%);
+  --nav-bg:rgba(8,9,11,.87);
+  --theme-chip-1:#d9dce5;
+  --theme-chip-2:#f0f2f7;
 }
-:root[data-theme="ametista"]{
-  color-scheme: light;
-  --page:#f2effb;
-  --page-2:#fbf9ff;
-  --paper:rgba(255,255,255,.84);
-  --paper-strong:#ffffff;
-  --paper-soft:rgba(255,255,255,.62);
-  --tint:#f2ecff;
-  --tint-strong:#e2d8fb;
-  --ink:#2b2441;
-  --ink-soft:#534a6f;
-  --mute:#7d7398;
-  --stroke:rgba(84,57,145,.13);
-  --stroke-strong:rgba(84,57,145,.22);
-  --accent:#7155b6;
-  --accent-2:#9a7fdd;
-  --accent-soft:#e4dbfb;
-  --accent-ink:#2f1f60;
-  --danger:#b55872;
-  --success:#35765e;
-  --warning:#ab7a2e;
-  --shadow:0 24px 60px rgba(76,49,132,.12);
-  --shadow-soft:0 16px 40px rgba(76,49,132,.08);
-  --glow: radial-gradient(circle at top left, rgba(154,127,221,.22), transparent 40%), radial-gradient(circle at bottom right, rgba(224,205,255,.32), transparent 32%);
-  --nav-bg:rgba(255,255,255,.76);
-  --theme-chip-1:#7155b6;
-  --theme-chip-2:#c7b7f2;
+:root[data-theme="floresta"]{
+  color-scheme:dark;
+  --page:#07100c;
+  --page-2:#0f2118;
+  --paper:rgba(12,28,20,.92);
+  --paper-strong:#102319;
+  --paper-soft:rgba(17,39,28,.84);
+  --tint:#1a3627;
+  --tint-strong:#24513a;
+  --ink:#f0f7ef;
+  --ink-soft:#cce3d3;
+  --mute:#a2c0ac;
+  --stroke:rgba(134,201,161,.20);
+  --stroke-strong:rgba(134,201,161,.35);
+  --accent:#87cba5;
+  --accent-2:#b2e2c4;
+  --accent-soft:rgba(135,203,165,.17);
+  --accent-ink:#c3f0d4;
+  --danger:#efa4a7;
+  --success:#a2e3bd;
+  --warning:#e2c58a;
+  --shadow:0 24px 60px rgba(0,0,0,.46);
+  --shadow-soft:0 16px 42px rgba(0,0,0,.34);
+  --glow:radial-gradient(circle at 5% 4%,rgba(135,203,165,.12),transparent 42%),radial-gradient(circle at 100% 100%,rgba(51,134,83,.10),transparent 40%);
+  --nav-bg:rgba(8,24,16,.84);
+  --theme-chip-1:#87cba5;
+  --theme-chip-2:#b2e2c4;
 }
-:root[data-theme="ember"]{
-  color-scheme: light;
-  --page:#faf1ec;
-  --page-2:#fffaf6;
-  --paper:rgba(255,255,255,.84);
-  --paper-strong:#ffffff;
-  --paper-soft:rgba(255,255,255,.60);
-  --tint:#fff0e8;
-  --tint-strong:#fde0d1;
-  --ink:#35231d;
-  --ink-soft:#5c433a;
-  --mute:#8c6f65;
-  --stroke:rgba(122,63,41,.14);
-  --stroke-strong:rgba(122,63,41,.22);
-  --accent:#b15d3d;
-  --accent-2:#d1865f;
-  --accent-soft:#f8dfd2;
-  --accent-ink:#592b19;
-  --danger:#b44b5d;
-  --success:#306f58;
-  --warning:#b67a1c;
-  --shadow:0 24px 60px rgba(94,48,31,.12);
-  --shadow-soft:0 16px 40px rgba(94,48,31,.08);
-  --glow: radial-gradient(circle at top left, rgba(209,134,95,.22), transparent 40%), radial-gradient(circle at bottom right, rgba(255,223,203,.36), transparent 32%);
-  --nav-bg:rgba(255,255,255,.78);
-  --theme-chip-1:#b15d3d;
-  --theme-chip-2:#f0bea8;
+:root[data-theme="vinho"]{
+  color-scheme:dark;
+  --page:#140b10;
+  --page-2:#26131c;
+  --paper:rgba(36,18,27,.92);
+  --paper-strong:#2c1822;
+  --paper-soft:rgba(48,23,35,.83);
+  --tint:#3d2230;
+  --tint-strong:#522d3f;
+  --ink:#f9f0f4;
+  --ink-soft:#e8ced9;
+  --mute:#c7a9b7;
+  --stroke:rgba(218,170,192,.19);
+  --stroke-strong:rgba(218,170,192,.34);
+  --accent:#dca6bc;
+  --accent-2:#f0c2d4;
+  --accent-soft:rgba(220,166,188,.16);
+  --accent-ink:#f3c8d8;
+  --danger:#f09fab;
+  --success:#a6d8bd;
+  --warning:#edcd99;
+  --shadow:0 24px 60px rgba(0,0,0,.46);
+  --shadow-soft:0 16px 42px rgba(0,0,0,.32);
+  --glow:radial-gradient(circle at 90% 7%,rgba(232,144,171,.15),transparent 40%),radial-gradient(circle at 5% 95%,rgba(135,43,76,.12),transparent 45%);
+  --nav-bg:rgba(29,13,22,.85);
+  --theme-chip-1:#dca6bc;
+  --theme-chip-2:#f0c2d4;
+}
+:root[data-theme="noturno"]{
+  color-scheme:dark;
+  --page:#060e1f;
+  --page-2:#111f3b;
+  --paper:rgba(12,24,50,.93);
+  --paper-strong:#15294a;
+  --paper-soft:rgba(17,36,70,.83);
+  --tint:#1c385d;
+  --tint-strong:#284d79;
+  --ink:#f0f6ff;
+  --ink-soft:#d1e2ff;
+  --mute:#a4beda;
+  --stroke:rgba(133,181,255,.20);
+  --stroke-strong:rgba(133,181,255,.34);
+  --accent:#84b4ff;
+  --accent-2:#bdd6ff;
+  --accent-soft:rgba(132,180,255,.16);
+  --accent-ink:#d2e5ff;
+  --danger:#f2a4b3;
+  --success:#a5d7c2;
+  --warning:#edd199;
+  --shadow:0 24px 60px rgba(0,0,0,.44);
+  --shadow-soft:0 16px 42px rgba(0,0,0,.33);
+  --glow:radial-gradient(circle at 80% 0%,rgba(74,136,250,.18),transparent 45%),radial-gradient(circle at 0% 95%,rgba(30,76,149,.12),transparent 40%);
+  --nav-bg:rgba(7,18,39,.85);
+  --theme-chip-1:#84b4ff;
+  --theme-chip-2:#bdd6ff;
 }
 :root[data-theme="grafite"]{
   color-scheme: dark;
@@ -431,42 +460,30 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .btn:not(:disabled):hover{filter:brightness(1.045);box-shadow:0 9px 18px color-mix(in srgb,var(--accent) 13%,transparent)}
 .btn:not(:disabled):active{transform:scale(.989)}
 .btn.secondary:hover{box-shadow:0 6px 14px color-mix(in srgb,var(--ink) 6%,transparent)}
-:root[data-theme="onyx"] .btn:not(.secondary):not(.light):not(.danger),
-:root[data-theme="grafite"] .btn:not(.secondary):not(.light):not(.danger){color:#182131}
-:root[data-theme="onyx"] .nav-item.active,
-:root[data-theme="grafite"] .nav-item.active{color:var(--accent-ink)}
-:root[data-theme="onyx"] .brand-card,
-:root[data-theme="grafite"] .brand-card,
-:root[data-theme="onyx"] .tile,
-:root[data-theme="grafite"] .tile,
-:root[data-theme="onyx"] .day,
-:root[data-theme="grafite"] .day,
-:root[data-theme="onyx"] .choice-btn,
-:root[data-theme="grafite"] .choice-btn{
+:root[data-theme]:not([data-theme="classico"]) .btn:not(.secondary):not(.light):not(.danger){color:#182131}
+:root[data-theme]:not([data-theme="classico"]) .nav-item.active{color:var(--accent-ink)}
+:root[data-theme]:not([data-theme="classico"]) .brand-card,
+:root[data-theme]:not([data-theme="classico"]) .tile,
+:root[data-theme]:not([data-theme="classico"]) .day,
+:root[data-theme]:not([data-theme="classico"]) .choice-btn{
   background:linear-gradient(160deg,var(--paper-strong),var(--tint));
   color:var(--ink);
 }
-:root[data-theme="onyx"] .tile.active,
-:root[data-theme="grafite"] .tile.active,
-:root[data-theme="onyx"] .choice-btn.selected,
-:root[data-theme="grafite"] .choice-btn.selected,
-:root[data-theme="onyx"] .day.selected,
-:root[data-theme="grafite"] .day.selected{
+:root[data-theme]:not([data-theme="classico"]) .tile.active,
+:root[data-theme]:not([data-theme="classico"]) .choice-btn.selected,
+:root[data-theme]:not([data-theme="classico"]) .day.selected{
   background:var(--accent-soft);
   color:var(--accent-ink);
   border-color:color-mix(in srgb,var(--accent) 55%,transparent);
 }
-:root[data-theme="onyx"] .tile-symbol,
-:root[data-theme="grafite"] .tile-symbol{
+:root[data-theme]:not([data-theme="classico"]) .tile-symbol{
   background:color-mix(in srgb,var(--accent-soft) 65%,var(--paper-strong));
   color:var(--accent);
 }
-:root[data-theme="onyx"] .brand-mark,
-:root[data-theme="grafite"] .brand-mark{
+:root[data-theme]:not([data-theme="classico"]) .brand-mark{
   box-shadow:0 7px 22px rgba(0,0,0,.27);
 }
-:root[data-theme="onyx"] .chip,
-:root[data-theme="grafite"] .chip{color:var(--accent-ink)}
+:root[data-theme]:not([data-theme="classico"]) .chip{color:var(--accent-ink)}
 /* Roster of strategies — compact readable cards, phrase distinction and fixed action dock */
 .main.has-strategy-dock{padding-bottom:186px}
 .strategy-heading{
@@ -605,10 +622,9 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   background:transparent;border:0;color:var(--accent-2);font-weight:850;font-size:13px;
   padding:9px 3px;white-space:nowrap;text-decoration:underline;text-underline-offset:3px
 }
-:root[data-theme="onyx"] .toast,
-:root[data-theme="grafite"] .toast{background:#efefe8;color:#17212e}
-:root[data-theme="onyx"] .toast-undo{color:#84561c}
-:root[data-theme="grafite"] .toast-undo{color:#315e99}
+:root[data-theme]:not([data-theme="classico"]) .toast{background:#efefe8;color:#17212e}
+:root[data-theme]:not([data-theme="classico"]) .toast-undo{color:#84561c}
+:root[data-theme]:not([data-theme="classico"]) .toast-undo{color:#315e99}
 /* Modals */
 .theme-modal-card{border-radius:26px;box-shadow:0 24px 65px color-mix(in srgb,var(--ink) 20%,transparent)}
 .theme-option{box-shadow:none;transition:transform .15s ease,border-color .15s ease}
@@ -642,3 +658,9 @@ button[data-action="calendar-day"]{touch-action:manipulation}
 }
 /* Keep the fixed preparation dock anchored to the actual viewport (not the app-shell document height). */
 .app-shell{backdrop-filter:none}
+
+/* Themes: picker remains usable with seven colors on short/small screens. */
+.theme-modal{max-height:100dvh;align-items:flex-end}
+.theme-modal-card{max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain}
+.theme-preview{border:1px solid var(--stroke-strong)}
+@media (max-height:620px){.theme-modal{padding:8px}.theme-modal-card{max-height:calc(100dvh - 16px)}}
