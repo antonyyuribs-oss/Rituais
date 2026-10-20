@@ -1,0 +1,11 @@
+{
+  "name": "Atividades e Moods",
+  "short_name": "Moods",
+  "description": "Preparações e registros pessoais",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f8fc",
+  "theme_color": "#f6f8fc",
+  "icons": [{"src":"assets/icone.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]
+}
