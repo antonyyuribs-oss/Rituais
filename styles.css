@@ -664,3 +664,168 @@ button[data-action="calendar-day"]{touch-action:manipulation}
 .theme-modal-card{max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain}
 .theme-preview{border:1px solid var(--stroke-strong)}
 @media (max-height:620px){.theme-modal{padding:8px}.theme-modal-card{max-height:calc(100dvh - 16px)}}
+
+/* Brand icon drawn inline; no external image request on Safari. */
+.brand-mark .brand-logo-svg {display:block;width:100%;height:100%;flex:none}
+
+/* RITUAIS v5 — multicolor accents, purposeful color hierarchy across every theme */
+:root[data-theme="classico"]{
+ --work-accent:#bb7536;--train-accent:#158d85;--food-accent:#c56564;--sleep-accent:#8469c6;
+ --mood-cool:#4279bf;--mood-warm:#cc7358;--mood-violet:#8066c4;--mood-fresh:#168f80;--mood-gold:#bc822b;
+ --brand-warm:rgba(230,159,92,.21);--brand-cool:rgba(82,171,191,.18);
+}
+:root[data-theme="onyx"]{
+ --work-accent:#e0ba74;--train-accent:#68c7b7;--food-accent:#ed917f;--sleep-accent:#bd9ee8;
+ --mood-cool:#8dbeff;--mood-warm:#ec9878;--mood-violet:#c0a6f2;--mood-fresh:#78c9b3;--mood-gold:#e6bf74;
+ --brand-warm:rgba(228,173,79,.17);--brand-cool:rgba(85,184,180,.16);
+}
+:root[data-theme="grafite"]{
+ --work-accent:#e4a27a;--train-accent:#6accc7;--food-accent:#e68db0;--sleep-accent:#b6a5fa;
+ --mood-cool:#85b7e9;--mood-warm:#e4a27a;--mood-violet:#b6a5fa;--mood-fresh:#6accc7;--mood-gold:#e5bf75;
+ --brand-warm:rgba(226,145,100,.16);--brand-cool:rgba(106,204,199,.13);
+}
+:root[data-theme="preto"]{
+ --work-accent:#f2be61;--train-accent:#5dd3d0;--food-accent:#f58fa1;--sleep-accent:#c29ffa;
+ --mood-cool:#83b9ff;--mood-warm:#f28e82;--mood-violet:#c29ffa;--mood-fresh:#5dd3d0;--mood-gold:#f2be61;
+ --brand-warm:rgba(242,190,97,.16);--brand-cool:rgba(93,211,208,.11);
+}
+:root[data-theme="floresta"]{
+ --work-accent:#efc16e;--train-accent:#70d0ba;--food-accent:#ee9481;--sleep-accent:#d3a5df;
+ --mood-cool:#88c9e9;--mood-warm:#ee9481;--mood-violet:#d3a5df;--mood-fresh:#70d0ba;--mood-gold:#efc16e;
+ --brand-warm:rgba(241,185,97,.16);--brand-cool:rgba(100,202,186,.15);
+}
+:root[data-theme="vinho"]{
+ --work-accent:#e9b179;--train-accent:#77d2b5;--food-accent:#f5a2ac;--sleep-accent:#c3a2ee;
+ --mood-cool:#95bee5;--mood-warm:#f5a2ac;--mood-violet:#c3a2ee;--mood-fresh:#77d2b5;--mood-gold:#e9b179;
+ --brand-warm:rgba(243,164,149,.17);--brand-cool:rgba(120,205,185,.12);
+}
+:root[data-theme="noturno"]{
+ --work-accent:#efbc74;--train-accent:#6bd1e0;--food-accent:#f195a3;--sleep-accent:#bbaaff;
+ --mood-cool:#8ebeff;--mood-warm:#f195a3;--mood-violet:#bbaaff;--mood-fresh:#6bd1e0;--mood-gold:#efbc74;
+ --brand-warm:rgba(241,191,116,.13);--brand-cool:rgba(107,209,224,.17);
+}
+/* Add complementary hues without compromising quiet surfaces and legibility. */
+body::before{
+ background:
+   radial-gradient(circle at 8% 12%,var(--brand-warm),transparent 42%),
+   radial-gradient(circle at 92% 46%,var(--brand-cool),transparent 52%),
+   var(--glow);
+}
+.brand-card,
+:root[data-theme]:not([data-theme="classico"]) .brand-card{
+ background:
+   radial-gradient(circle at 14% 0%,var(--brand-warm),transparent 48%),
+   radial-gradient(circle at 100% 100%,var(--brand-cool),transparent 56%),
+   linear-gradient(130deg,var(--paper-strong),var(--tint));
+ border-color:var(--stroke-strong);
+}
+.brand-card::before{background:radial-gradient(circle,var(--brand-cool),transparent 69%)}
+.brand-card::after{background:radial-gradient(circle,var(--brand-warm),transparent 74%)}
+/* Distinct, context-driven color per activity (four colors in every theme). */
+.activity-tile[data-id="work"]{--tile-accent:var(--work-accent)}
+.activity-tile[data-id="train"]{--tile-accent:var(--train-accent)}
+.activity-tile[data-id="food"]{--tile-accent:var(--food-accent)}
+.activity-tile[data-id="sleep"]{--tile-accent:var(--sleep-accent)}
+:root[data-theme] .activity-tile{
+ border:1px solid color-mix(in srgb,var(--tile-accent) 30%,var(--stroke));
+ background:linear-gradient(155deg,color-mix(in srgb,var(--tile-accent) 13%,var(--paper-strong)),var(--paper-strong) 66%,color-mix(in srgb,var(--tile-accent) 6%,var(--paper-strong)));
+ overflow:hidden;
+}
+:root[data-theme] .activity-tile::before{
+ content:"";position:absolute;inset:0 0 auto;height:3px;
+ background:linear-gradient(90deg,var(--tile-accent),color-mix(in srgb,var(--tile-accent) 18%,transparent));
+ border-radius:23px 23px 0 0;
+}
+:root[data-theme] .activity-tile .tile-symbol{
+ background:linear-gradient(135deg,color-mix(in srgb,var(--tile-accent) 23%,var(--paper-strong)),color-mix(in srgb,var(--tile-accent) 7%,var(--paper-strong)));
+ border-color:color-mix(in srgb,var(--tile-accent) 42%,transparent);
+ color:var(--tile-accent);
+ box-shadow:inset 0 1px 0 color-mix(in srgb,var(--tile-accent) 10%,transparent);
+}
+:root[data-theme] .activity-tile:hover{
+ border-color:color-mix(in srgb,var(--tile-accent) 52%,var(--stroke));
+}
+body[data-activity="work"]{--context-accent:var(--work-accent)}
+body[data-activity="train"]{--context-accent:var(--train-accent)}
+body[data-activity="food"]{--context-accent:var(--food-accent)}
+body[data-activity="sleep"]{--context-accent:var(--sleep-accent)}
+body[data-activity] .topbar .activity-icon{color:var(--context-accent)}
+body[data-activity] .topbar .activity-name{color:var(--ink)}
+body[data-activity] .chip{
+ background:color-mix(in srgb,var(--context-accent) 16%,var(--paper-strong));
+ border-color:color-mix(in srgb,var(--context-accent) 30%,transparent);
+ color:var(--ink);
+}
+/* Moods are colored by character (energy, calm, stimulation), not by one global tint. */
+.tile.mood-tile[data-tone="cool"],.choice-btn.mood-choice[data-tone="cool"]{--mood-color:var(--mood-cool)}
+.tile.mood-tile[data-tone="warm"],.choice-btn.mood-choice[data-tone="warm"]{--mood-color:var(--mood-warm)}
+.tile.mood-tile[data-tone="fresh"],.choice-btn.mood-choice[data-tone="fresh"]{--mood-color:var(--mood-fresh)}
+.tile.mood-tile[data-tone="violet"],.choice-btn.mood-choice[data-tone="violet"]{--mood-color:var(--mood-violet)}
+.tile.mood-tile[data-tone="gold"],.choice-btn.mood-choice[data-tone="gold"]{--mood-color:var(--mood-gold)}
+:root[data-theme] .mood-tile{
+ background:linear-gradient(145deg,color-mix(in srgb,var(--mood-color) 9%,var(--paper-strong)),var(--paper-strong));
+ border-color:color-mix(in srgb,var(--mood-color) 27%,var(--stroke));
+}
+:root[data-theme] .mood-tile .tile-symbol{
+ color:var(--mood-color);
+ background:color-mix(in srgb,var(--mood-color) 14%,var(--paper-strong));
+ border-color:color-mix(in srgb,var(--mood-color) 22%,var(--stroke));
+}
+:root[data-theme] .mood-tile.active{
+ background:linear-gradient(145deg,color-mix(in srgb,var(--mood-color) 24%,var(--paper-strong)),color-mix(in srgb,var(--mood-color) 8%,var(--paper-strong)));
+ border-color:var(--mood-color);
+ color:var(--ink);
+ box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--mood-color) 17%,transparent);
+}
+:root[data-theme] .mood-tile.active .checkmark{color:var(--mood-color)}
+:root[data-theme] .mood-choice.selected{
+ background:color-mix(in srgb,var(--mood-color) 20%,var(--paper-strong));
+ border-color:var(--mood-color);
+ color:var(--ink);
+}
+:root[data-theme] .mood-choice:not(.selected){
+ background:color-mix(in srgb,var(--mood-color) 7%,var(--paper-strong));
+}
+/* Mix complementary colors into brand accents, record icons, chips and feedback. */
+:root[data-theme] .saved-banner{
+ background:color-mix(in srgb,var(--train-accent) 16%,var(--paper-strong));
+ color:var(--ink);border-color:color-mix(in srgb,var(--train-accent) 27%,transparent);
+}
+:root[data-theme] .saved-banner svg{color:var(--train-accent)}
+:root[data-theme] .strategy-row.is-phrase{
+ border-color:color-mix(in srgb,var(--sleep-accent) 38%,var(--stroke));
+ background:linear-gradient(90deg,color-mix(in srgb,var(--sleep-accent) 16%,var(--paper-strong)),var(--paper-strong));
+}
+:root[data-theme] .strategy-row.is-phrase::before{background:var(--sleep-accent)}
+:root[data-theme] .strategy-list .kind{color:var(--sleep-accent)}
+:root[data-theme] .check-strategy.is-phrase{border-left-color:var(--sleep-accent);background:color-mix(in srgb,var(--sleep-accent) 13%,var(--paper-strong))}
+:root[data-theme] .check-strategy.is-phrase .kind{color:var(--sleep-accent)}
+:root[data-theme] .record-icon{color:var(--accent)}
+.day-record:has(.record-icon) {border-color:var(--stroke)}
+:root[data-theme] .import-history-action{
+ background:linear-gradient(100deg,color-mix(in srgb,var(--train-accent) 12%,var(--paper-strong)),var(--paper-strong));
+ border-color:color-mix(in srgb,var(--train-accent) 30%,var(--stroke));
+}
+:root[data-theme] .import-history-action svg{color:var(--train-accent)}
+:root[data-theme] .danger-zone{margin-top:28px}
+:root[data-theme] .danger-zone .btn.danger{
+ background:color-mix(in srgb,var(--danger) 9%,var(--paper-strong));
+ border-color:color-mix(in srgb,var(--danger) 45%,var(--stroke));
+ color:var(--danger);
+}
+/* Palette cards show the colorful accents before choosing. */
+:root[data-theme] .theme-preview{
+ background:linear-gradient(135deg,color-mix(in srgb,var(--swatch-1) 22%,var(--paper-strong)),color-mix(in srgb,var(--swatch-3) 16%,var(--paper-strong)));
+ display:flex;align-items:flex-end;justify-content:space-between;gap:7px;
+}
+:root[data-theme] .theme-preview .p1,
+:root[data-theme] .theme-preview .p2,
+:root[data-theme] .theme-preview .p3,
+:root[data-theme] .theme-preview .p4{
+ flex:1;width:auto;border-radius:8px 8px 4px 4px;box-shadow:0 3px 10px rgba(0,0,0,.12)
+}
+:root[data-theme] .theme-preview .p1{background:var(--swatch-1)}
+:root[data-theme] .theme-preview .p2{background:var(--swatch-2);height:79%}
+:root[data-theme] .theme-preview .p3{background:var(--swatch-3);height:92%}
+:root[data-theme] .theme-preview .p4{background:color-mix(in srgb,var(--swatch-1) 40%,var(--swatch-3));height:67%}
+@media(prefers-reduced-motion:reduce){:root[data-theme] .activity-tile{transition:none}}

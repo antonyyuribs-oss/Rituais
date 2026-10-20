@@ -1,6 +1,17 @@
-# RITUAIS
+# RITUAIS — versão 5
 
 Aplicativo web estático para identificar moods, selecionar estratégias de preparação, registrar execução e guardar feedback opcional.
+
+## Novidades da versão 5
+
+- **Excluir registro:** Histórico → dia → registro → **Excluir registro** (na parte inferior). A exclusão exige confirmação e não modifica os outros registros ou estratégias permanentes.
+- **Importar histórico (JSON):** Histórico → **Importar histórico (JSON)**, logo abaixo de **Exportar Histórico (JSON)**. Aceita arquivos produzidos por **Exportar Histórico** neste app. A importação **acrescenta** registros, ignora IDs já existentes, mantém as preferências, moods e estratégias atuais e abre o dia mais recente importado. Não restaura configurações ou repertórios.
+- **Backup completo:** continua disponível para substituir integralmente os dados atuais por um backup. **Não confundir com importar histórico.**
+- **Temas multicoloridos:** mantidos os sete temas anteriores, mas agora cada atividade possui acentos próprios e moods exibem variações cromáticas. Os temas escuros continuam escuros.
+- **Ícone corrigido:** a marca na página inicial permanece desenhada diretamente no HTML para não depender do carregamento de uma imagem externa no Safari.
+
+**Antes de atualizar uma instalação existente, salve um Backup completo.** Para atualizar no GitHub Pages, substitua todos os arquivos do repositório, preservando o mesmo endereço do site. A chave de armazenamento local é mantida para preservar os dados no mesmo navegador.
+
 
 ## Refinamento visual — segunda rodada
 
@@ -62,7 +73,7 @@ Não é necessário instalar bibliotecas nem executar comandos de build.
 
 - **Início:** quatro atividades em quadrados → moods → todas as estratégias correspondentes → salvar preparação → marcar as executadas → feedback opcional → finalizar.
 - **Temas:** botão de paleta na página inicial para trocar as cores do aplicativo.
-- **Histórico:** calendário. Ao abrir, exportação e backup aparecem abaixo do calendário. Toque em um dia para ver os registros; toque no mesmo dia de novo para retornar aos botões de exportação.
+- **Histórico:** calendário. Ao abrir, exportação, importação de histórico e backup aparecem abaixo do calendário. Toque em um dia para ver os registros; toque no mesmo dia de novo para retornar às opções de exportação, importação e backup.
 - **Registro retroativo:** no calendário, use o botão `+` no cabeçalho; escolha a atividade e ajuste data e horário nos detalhes do registro.
 - **Edição:** abra um registro no calendário. Todos os campos e estratégias daquele registro podem ser ajustados; registros finalizados continuam editáveis.
 - **Estratégia permanente:** ao cadastrar, marque “Salvar permanentemente”. O repertório também pode ser editado pela tela de estratégias. Apagar uma estratégia do repertório não modifica registros históricos.
@@ -73,3 +84,10 @@ A análise de tendências não é feita dentro do aplicativo: exporte o históri
 ## Tecnologia
 
 HTML, CSS e JavaScript nativos, sem dependências externas. Armazenamento no navegador via `localStorage`.
+
+
+## Correção v4 — Símbolo ao lado do nome
+
+O símbolo ao lado de **RITUAIS** agora é desenhado diretamente na página (SVG integrado), sem depender da imagem `assets/icone.svg`. Isso elimina a interrogação/ícone de imagem quebrada no Safari quando o arquivo não é carregado. Os ícones de instalação continuam na pasta `assets`.
+
+Substitua todos os arquivos do repositório pelos arquivos desta versão, mantendo o mesmo endereço do GitHub Pages. Antes da atualização, faça Backup completo.
