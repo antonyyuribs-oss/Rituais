@@ -1,6 +1,15 @@
 (() => {
 'use strict';
-const STORAGE_KEY = 'atividades_moods_app_v2';
+const STORAGE_KEY = 'rituais_app_v3';
+const LEGACY_STORAGE_KEY = 'atividades_moods_app_v2';
+const THEME_PRESETS = [
+  {id:'classico', name:'Azul Clássico', desc:'elegante e sereno', themeColor:'#1f3656', swatch:['#2f5f9f','#8fc3ff','#d7e8ff']},
+  {id:'onyx', name:'Ônix Dourado', desc:'escuro e sofisticado', themeColor:'#151a22', swatch:['#d4b46e','#f1d69a','#2a3445']},
+  {id:'sage', name:'Sálvia', desc:'calmo e orgânico', themeColor:'#4f7d68', swatch:['#4f7d68','#a7ceb8','#e3f0e8']},
+  {id:'ametista', name:'Ametista', desc:'refinado e criativo', themeColor:'#7155b6', swatch:['#7155b6','#c7b7f2','#efeaff']},
+  {id:'ember', name:'Âmbar', desc:'quente e acolhedor', themeColor:'#b15d3d', swatch:['#b15d3d','#f0bea8','#fff1e8']},
+  {id:'grafite', name:'Grafite', desc:'moderno e sóbrio', themeColor:'#1d232c', swatch:['#7ca6de','#cfe0fa','#2b3444']}
+];
 const ACTIVITIES = [
   {id:'work', name:'Trabalho Matutino', icon:'scale', question:'Conseguiu trabalhar pela manhã?'},
   {id:'train', name:'Treino Vespertino', icon:'footprints', question:'Conseguiu iniciar o treino?'},
@@ -30,7 +39,7 @@ const PATHS = {
  house:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V10ZM9 21v-8h6v8"/>',
  history:'<path d="M3 12a9 9 0 1 0 3-6.7M3 3v6h6M12 7v5l4 2"/>',
  back:'<path d="m15 18-6-6 6-6"/>',left:'<path d="m15 18-6-6 6-6"/>',right:'<path d="m9 18 6-6-6-6"/>',plus:'<path d="M12 5v14M5 12h14"/>',check:'<path d="m5 12 5 5L20 7"/>',x:'<path d="M5 5l14 14M19 5 5 19"/>',pencil:'<path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4L16.5 3.5Z"/>',trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7M14 10v7"/>',
- down:'<path d="m6 9 6 6 6-6"/>',up:'<path d="m6 15 6-6 6 6"/>',download:'<path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/>',upload:'<path d="M12 16V4m-4 4 4-4 4 4M4 17v4h16v-4"/>',archive:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18m-12 6 3 3 4-5"/>',circle:'<circle cx="12" cy="12" r="7"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',redo:'<path d="M4 11a8 8 0 1 1 2 6M4 4v7h7"/>'
+ down:'<path d="m6 9 6 6 6-6"/>',up:'<path d="m6 15 6-6 6 6"/>',download:'<path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/>',upload:'<path d="M12 16V4m-4 4 4-4 4 4M4 17v4h16v-4"/>',archive:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18m-12 6 3 3 4-5"/>',circle:'<circle cx="12" cy="12" r="7"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',redo:'<path d="M4 11a8 8 0 1 1 2 6M4 4v7h7"/>',palette:'<path d="M12 3a9 9 0 0 0 0 18h1.1a1.9 1.9 0 0 0 0-3.8h-.4a1.7 1.7 0 0 1-1.7-1.7A1.7 1.7 0 0 1 12.7 14H15a6 6 0 0 0 0-12h-3Z"/><circle cx="7.5" cy="9" r="1"/><circle cx="9.5" cy="6.7" r="1"/><circle cx="13" cy="6.7" r="1"/><circle cx="15.4" cy="9" r="1"/>',sparkles:'<path d="M12 3l1.2 3.2L16.5 7.5l-3.3 1.3L12 12l-1.2-3.2L7.5 7.5l3.3-1.3L12 3Zm6.4 9.6.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7.7-2ZM5 14l1 2.6L8.6 17 6 18l-1 2.5L4 18l-2.6-1 2.6-.4L5 14Z"/>'
 };
 const icon = (name, klass='') => `<svg class="icon ${klass}" viewBox="0 0 24 24" aria-hidden="true">${PATHS[name]||PATHS.circle}</svg>`;
 const esc = value => String(value??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
@@ -88,19 +97,27 @@ function seedData(){
    }
   };
   Object.entries(rows).forEach(([aid,byMood])=>Object.entries(byMood).forEach(([m,items])=>items.forEach(t=>add(aid,m,t,/(^Não entrar|já é um resultado|não exige gastar|Escolher conscientemente)/i.test(t)?'frase':'acao'))));
-  return {schemaVersion:2,moods,strategies,records:[],createdAt:new Date().toISOString()};
+  return {schemaVersion:2,moods,strategies,records:[],settings:{theme:'classico'},createdAt:new Date().toISOString()};
 }
 let db;
 let storageFault=false;
 try{
-  const saved=localStorage.getItem(STORAGE_KEY);
+  const saved=localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
   db=saved?JSON.parse(saved):seedData();
   if(!db||db.schemaVersion!==2||!Array.isArray(db.records)||!Array.isArray(db.strategies)||!db.moods) throw new Error('invalid');
 }catch(e){db=seedData();storageFault=true;}
+if(!db.settings||typeof db.settings!=='object') db.settings={theme:'classico'};
+if(!THEME_PRESETS.some(t=>t.id===db.settings.theme)) db.settings.theme='classico';
 const today=nowLocal();
 const ui={view:'home',recordId:null,historyYear:Number(today.date.slice(0,4)),historyMonth:Number(today.date.slice(5,7))-1,historyDay:null,addMood:false,editMoodId:null,addingStrategy:false,editStrategyId:null,managerFilter:'all',feedbackExpanded:false,retroDate:null,retro:false};
-const main=document.getElementById('main');const navigation=document.getElementById('navigation');let toastTimer;
+const main=document.getElementById('main');const navigation=document.getElementById('navigation');const themeFab=document.getElementById('theme-fab');const themeModal=document.getElementById('theme-modal');const themeBackdrop=document.getElementById('theme-backdrop');const themeOptions=document.getElementById('theme-options');const themeClose=document.getElementById('theme-close');if(themeFab)themeFab.innerHTML=icon('palette');let toastTimer;
 function toast(message){const t=document.getElementById('toast');t.textContent=message;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.hidden=true,3700);}
+function currentTheme(){return db.settings?.theme||'classico';}
+function applyTheme(){const preset=THEME_PRESETS.find(t=>t.id===currentTheme())||THEME_PRESETS[0];document.documentElement.setAttribute('data-theme',preset.id);document.querySelector('meta[name="theme-color"]')?.setAttribute('content',preset.themeColor);}
+function renderThemeOptions(){if(!themeOptions)return;const active=currentTheme();themeOptions.innerHTML=THEME_PRESETS.map(t=>`<button type="button" class="theme-option ${t.id===active?'active':''}" data-action="set-theme" data-id="${t.id}"><div class="theme-preview" style="background:linear-gradient(135deg, ${t.swatch[0]}, ${t.swatch[1]})"><span class="p1"></span><span class="p2"></span><span class="p3"></span><span class="p4"></span></div><div><div class="theme-name">${t.name}</div><div class="theme-desc">${t.desc}</div></div></button>`).join('');}
+function openThemeModal(){renderThemeOptions();themeBackdrop.hidden=false;themeModal.hidden=false;document.body.classList.add('modal-open');}
+function closeThemeModal(){themeBackdrop.hidden=true;themeModal.hidden=true;document.body.classList.remove('modal-open');}
+function chooseTheme(id){if(!THEME_PRESETS.some(t=>t.id===id))return;db.settings.theme=id;persist();applyTheme();renderThemeOptions();toast('Tema atualizado.');}
 function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db));storageFault=false;return true;}catch(e){storageFault=true;toast('Erro ao salvar. Exporte um backup e verifique o espaço disponível.');return false;}}
 function rec(){return db.records.find(x=>x.id===ui.recordId)||null;}
 function activityMoods(id,activeOnly=true){return (db.moods[id]||[]).filter(m=>!activeOnly||m.active);}
@@ -112,7 +129,7 @@ function view(name){ui.view=name;ui.addMood=false;ui.addingStrategy=false;ui.edi
 function setTab(name){if(name==='history'){ui.historyDay=null;const now=nowLocal().date;ui.historyMonth=Number(now.slice(5,7))-1;ui.historyYear=Number(now.slice(0,4));}ui.recordId=null;ui.retro=false;view(name);}
 function header(a,back='back'){return `<header class="topbar"><button type="button" class="icon-button" data-action="${back}" aria-label="Voltar">${icon('back')}</button><span class="activity-name">${esc(a.name)}</span>${icon(a.icon,'activity-icon')}</header>`;}
 function tilesActivity(action){return `<div class="tiles">${ACTIVITIES.map(a=>`<button type="button" class="tile" data-action="${action}" data-id="${a.id}">${icon(a.icon)}<span class="title">${esc(a.name)}</span></button>`).join('')}</div>`;}
-function renderHome(){return tilesActivity('start');}
+function renderHome(){return `<section class="brand-card"><div class="row" style="gap:14px"><div class="brand-mark">${icon('sparkles')}</div><h1 class="brand-title">RITUAIS</h1></div><div class="brand-actions"><button class="icon-button" type="button" data-action="open-themes" aria-label="Alterar cores">${icon('palette')}</button></div></section><div class="tile-intro">${tilesActivity('start')}</div>`;}
 function renderRetro(){return `<div class="topbar"><button class="icon-button" data-action="back" aria-label="Voltar">${icon('back')}</button><strong class="activity-name">Novo registro</strong>${icon('clock','activity-icon')}</div>${tilesActivity('start-retro')}<p class="help mt">Data e horário poderão ser alterados no Histórico.</p>`;}
 function renderMoods(){const r=rec();if(!r)return renderHome();const a=ACT(r.activityId);const moods=activityMoods(a.id);return `${header(a)}<div class="tiles">${moods.map(m=>{const active=r.initialMoods.some(x=>x.id===m.id);return `<button type="button" class="tile ${active?'active':''}" aria-pressed="${active}" data-action="toggle-initial-mood" data-id="${esc(m.id)}">${icon(m.icon||MOOD_ICONS[m.name]||'circle')}<span class="title">${esc(m.name)}</span>${icon('check','checkmark')}</button>`;}).join('')}</div><div class="actions"><button class="btn" data-action="to-strategies" ${!r.initialMoods.length?'disabled':''}>Ver estratégias ${icon('right')}</button><button class="btn secondary" data-action="toggle-add-mood">${icon('plus')} Adicionar mood</button></div>${ui.addMood?moodEditorMarkup(null,'new'):''}<div class="mt-sm" style="text-align:center"><button class="muted-link" data-action="mood-manager">Gerenciar moods</button></div>`;}
 function moodEditorMarkup(m,scope){return `<form class="form-card mt-sm" data-form="save-mood" data-scope="${scope}" ${m?`data-id="${esc(m.id)}"`:''}><label class="form-label">${m?'Editar mood':'Novo mood'}<input name="name" maxlength="45" placeholder="Nome do mood" value="${esc(m?.name||'')}" required autocomplete="off"></label><div class="split"><button type="submit" class="btn">Salvar</button><button type="button" class="btn secondary" data-action="cancel-edit">Cancelar</button></div></form>`;}
@@ -140,7 +157,7 @@ function renderEditRecord(r){return `<div class="field"><label class="form-label
 function renderTabs(){const active=['history','record','record-edit','retro'].includes(ui.view)?'history':'home';navigation.innerHTML=`<button class="nav-item ${active==='home'?'active':''}" data-action="tab-home" ${active==='home'?'aria-current="page"':''}>${icon('house')}<span>Início</span></button><button class="nav-item ${active==='history'?'active':''}" data-action="tab-history" ${active==='history'?'aria-current="page"':''}>${icon('history')}<span>Histórico</span></button>`;}
 function render(){main.classList.toggle('is-home',ui.view==='home');const routes={home:renderHome,moods:renderMoods,'mood-manager':renderMoodManager,strategies:renderStrategies,'strategy-manager':renderStrategyManager,execute:renderExecute,feedback:renderFeedback,history:renderHistory,record:renderRecord,'record-edit':renderRecord,retro:renderRetro};main.innerHTML=(routes[ui.view]||renderHome)();renderTabs();}
 function updateMoods(field,id){const r=rec();if(!r)return;const catalog=activityMoods(r.activityId,false).find(m=>m.id===id);if(!catalog)return;const current=r[field]||[];r[field]=current.some(m=>m.id===id)?current.filter(m=>m.id!==id):[...current,{id:catalog.id,name:catalog.name}];touch(r);render();}
-function createFile(kind){const payload=kind==='historico'?{type:'historico',schemaVersion:2,exportedAt:new Date().toISOString(),records:db.records}:{type:'backup',schemaVersion:2,exportedAt:new Date().toISOString(),data:db};const filename=`${kind==='historico'?'historico':'backup'}-moods-${nowLocal().date}.json`;const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.download=filename;a.href=url;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);toast('Arquivo preparado para download.');}
+function createFile(kind){const payload=kind==='historico'?{type:'historico',schemaVersion:2,exportedAt:new Date().toISOString(),records:db.records}:{type:'backup',schemaVersion:2,exportedAt:new Date().toISOString(),data:db};const filename=`${kind==='historico'?'historico':'backup'}-rituais-${nowLocal().date}.json`;const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.download=filename;a.href=url;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);toast('Arquivo preparado para download.');}
 function mergeMoodName(name,activity){return activityMoods(activity,false).some(m=>nameKey(m.name)===nameKey(name));}
 function saveMood(form){const r=rec();if(!r)return;const id=form.dataset.id;const n=String(new FormData(form).get('name')||'').trim();if(!n)return;const match=activityMoods(r.activityId,false).some(m=>m.id!==id&&nameKey(m.name)===nameKey(n));if(match){toast('Já existe um mood com esse nome.');return;}if(id){const m=activityMoods(r.activityId,false).find(x=>x.id===id);if(!m)return;m.name=n;}else{const m={id:uid(),name:n,icon:MOOD_ICONS[n]||'circle',active:true};db.moods[r.activityId].push(m);if(ui.view==='moods')r.initialMoods.push({id:m.id,name:m.name});}persist();ui.addMood=false;ui.editMoodId=null;render();}
 function saveStrategy(form){const r=rec();if(!r)return;const data=new FormData(form);const text=String(data.get('text')||'').trim();const moodIds=data.getAll('for-mood').map(String);if(!text){toast('Digite o texto da estratégia.');return;}const editingId=form.dataset.id;const inManager=form.dataset.manager==='1';if(!moodIds.length){toast('Selecione pelo menos um mood.');return;}const kind=data.has('is-phrase')?'frase':'acao';if(editingId){const s=db.strategies.find(s=>s.id===editingId);if(!s)return;s.text=text;s.moodIds=moodIds;s.kind=kind;s.updatedAt=new Date().toISOString();}else if(inManager||data.has('permanent')){const s={id:uid(),activityId:r.activityId,moodIds,text,kind,active:true,createdAt:new Date().toISOString()};db.strategies.push(s);}else{r.temporaryStrategies.push({id:uid(),activityId:r.activityId,moodIds,text,kind});touch(r);}persist();ui.addingStrategy=false;ui.editStrategyId=null;render();}
@@ -198,6 +215,8 @@ const clickHandlers={
  'cancel-historical-edit':()=>{ui.editStrategyId=null;render();},
  'remove-historical-strategy':el=>{const r=rec();if(!r)return;const s=r.strategies.find(x=>x.id===el.dataset.id);if(s&&!window.confirm('Retirar esta estratégia apenas deste registro?'))return;r.strategies=r.strategies.filter(x=>x.id!==el.dataset.id);touch(r);render();},
  'toggle-add-historical':()=>{ui.addingStrategy=!ui.addingStrategy;render();},
+ 'open-themes':()=>openThemeModal(),
+ 'set-theme':el=>chooseTheme(el.dataset.id),
  'export-history':()=>createFile('historico'),
  'export-backup':()=>createFile('backup'),
  'restore-backup':()=>document.getElementById('import-file').click(),
@@ -213,6 +232,10 @@ document.addEventListener('change',event=>{const el=event.target;const r=rec();i
  if(el.id==='manager-filter'){ui.managerFilter=el.value;render();return;}
 });
 document.addEventListener('input',event=>{const el=event.target;if(el.id!=='notes'&&el.id!=='edit-notes')return;const r=rec();if(!r)return;r.notes=el.value;touch(r);});
+themeFab?.addEventListener('click',openThemeModal);
+themeClose?.addEventListener('click',closeThemeModal);
+themeBackdrop?.addEventListener('click',closeThemeModal);
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!themeModal.hidden)closeThemeModal();});
 const fileInput=document.getElementById('import-file');
 fileInput.addEventListener('change',async event=>{const file=event.target.files?.[0];fileInput.value='';if(!file)return;if(file.size>8*1024*1024){toast('O arquivo é grande demais para restaurar aqui.');return;}
  try{const content=JSON.parse(await file.text());if(content.type!=='backup'||content.schemaVersion!==2||!content.data)throw new Error('Este arquivo não é um backup completo compatível.');const replacement=content.data;if(replacement.schemaVersion!==2||!Array.isArray(replacement.records)||!Array.isArray(replacement.strategies)||!replacement.moods||ACTIVITIES.some(a=>!Array.isArray(replacement.moods[a.id])))throw new Error('Backup incompleto ou inválido.');if(!window.confirm('Restaurar o backup? Todos os registros e personalizações atuais serão substituídos. Recomenda-se exportar um backup antes.'))return;
@@ -220,6 +243,7 @@ fileInput.addEventListener('change',async event=>{const file=event.target.files?
  }catch(e){toast(e.message||'Não foi possível ler o backup.');}
 });
 window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY&&event.newValue){try{const fresh=JSON.parse(event.newValue);if(fresh.schemaVersion===2&&Array.isArray(fresh.records)){db=fresh;render();}}catch(e){}}});
+applyTheme();
 if(storageFault)toast('Armazenamento não disponível. Verifique as configurações do navegador.');
 render();
 })();

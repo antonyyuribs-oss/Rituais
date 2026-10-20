@@ -1,11 +1,19 @@
-# Atividades e Moods
+# RITUAIS
 
-Aplicativo web estático para escolher atividades, identificar moods, selecionar estratégias de preparação, registrar o que foi executado e guardar feedback opcional.
+Aplicativo web estático para identificar moods, selecionar estratégias de preparação, registrar execução e guardar feedback opcional.
+
+## Diferenciais desta versão
+
+- visual refinado, com aparência mais premium;
+- nome do app na página inicial: **RITUAIS**;
+- temas de cor personalizáveis dentro do próprio app;
+- ícones de instalação atualizados para GitHub Pages e tela inicial do celular;
+- armazenamento local no navegador, com exportação e backup manual.
 
 ## Publicar no GitHub Pages
 
 1. Crie um repositório no GitHub.
-2. Envie **todo o conteúdo desta pasta** para a raiz do repositório: `index.html`, `styles.css`, `app.js`, `manifest.webmanifest` e `assets/icone.svg`.
+2. Envie **todo o conteúdo desta pasta** para a raiz do repositório: `index.html`, `styles.css`, `app.js`, `manifest.webmanifest`, `README.md` e a pasta `assets`.
 3. Abra **Settings → Pages** no repositório.
 4. Em **Build and deployment**, escolha **Deploy from a branch**, ramo `main`, pasta `/ (root)`; salve.
 5. Aguarde o endereço `https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO/` ficar disponível.
@@ -18,12 +26,13 @@ Não é necessário instalar bibliotecas nem executar comandos de build.
 - A instalação em outro aparelho, o uso de outro navegador, a limpeza dos dados do site ou determinadas configurações de privacidade podem tornar os registros inacessíveis.
 - Em **Histórico**, use **Backup completo** regularmente. Guarde o arquivo em lugar seguro.
 - **Restaurar backup** substitui os dados atuais pelo conteúdo do arquivo escolhido. Exporte um backup antes de restaurar outro arquivo.
-- **Exportar histórico (JSON)** gera apenas os registros para análise; **Backup completo (JSON)** inclui os registros, os moods e todo o repertório de estratégias.
+- **Exportar histórico (JSON)** gera apenas os registros para análise; **Backup completo (JSON)** inclui os registros, os moods e todo o repertório de estratégias, além do tema selecionado.
 - Se abrir `index.html` diretamente como arquivo (`file://`), o comportamento de armazenamento pode variar conforme o navegador. Recomenda-se GitHub Pages (HTTPS).
 
 ## Funcionamento
 
 - **Início:** quatro atividades em quadrados → moods → todas as estratégias correspondentes → salvar preparação → marcar as executadas → feedback opcional → finalizar.
+- **Temas:** botão de paleta para trocar as cores do aplicativo.
 - **Histórico:** calendário. Ao abrir, exportação e backup aparecem abaixo do calendário. Toque em um dia para ver os registros; toque no mesmo dia de novo para retornar aos botões de exportação.
 - **Registro retroativo:** no calendário, use o botão `+` no cabeçalho; escolha a atividade e ajuste data e horário nos detalhes do registro.
 - **Edição:** abra um registro no calendário. Todos os campos e estratégias daquele registro podem ser ajustados; registros finalizados continuam editáveis.
