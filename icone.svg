@@ -1,27 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#111c31"/>
-      <stop offset="100%" stop-color="#355785"/>
+      <stop offset="0%" stop-color="#14233c"/>
+      <stop offset="100%" stop-color="#32578b"/>
     </linearGradient>
-    <radialGradient id="glowA" cx="75%" cy="15%" r="55%">
-      <stop offset="0%" stop-color="#ffe6aa" stop-opacity="0.22"/>
-      <stop offset="100%" stop-color="#ffe6aa" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glowB" cx="15%" cy="85%" r="55%">
-      <stop offset="0%" stop-color="#83b8ff" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#83b8ff" stop-opacity="0"/>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f3d58f"/>
+      <stop offset="100%" stop-color="#f8e7bf"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="28%" cy="18%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <rect width="512" height="512" rx="112" fill="url(#glowA)"/>
-  <rect width="512" height="512" rx="112" fill="url(#glowB)"/>
-  <circle cx="256" cy="256" r="164" fill="none" stroke="#e3c67d" stroke-width="14"/>
-  <circle cx="256" cy="256" r="116" fill="none" stroke="#ffffff" stroke-opacity=".28" stroke-width="6"/>
-  <path d="M198 192a58 58 0 0 1 116 0" fill="none" stroke="#f4efdf" stroke-width="20" stroke-linecap="round"/>
-  <path d="M198 250v118" fill="none" stroke="#f4efdf" stroke-width="20" stroke-linecap="round"/>
-  <path d="M314 250v118" fill="none" stroke="#f4efdf" stroke-width="20" stroke-linecap="round"/>
-  <path d="M214 388h84" fill="none" stroke="#e3c67d" stroke-width="12" stroke-linecap="round"/>
-  <path d="M227 410h58" fill="none" stroke="#e3c67d" stroke-width="10" stroke-linecap="round"/>
-  <path d="M256 180v36M238 198h36M244 186l24 24M268 186l-24 24" fill="none" stroke="#e3c67d" stroke-width="10" stroke-linecap="round"/>
+  <rect width="512" height="512" rx="112" fill="url(#glow)"/>
+  <circle cx="256" cy="256" r="154" fill="none" stroke="url(#gold)" stroke-width="14"/>
+  <path d="M206 334V238c0-27 22-49 50-49s50 22 50 49v96" fill="none" stroke="#f7f1df" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M222 350h68" fill="none" stroke="url(#gold)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M256 154v26M243 167h26M247 158l18 18M265 158l-18 18" fill="none" stroke="url(#gold)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M178 286c22 48 69 82 126 82 12 0 24-2 35-5" fill="none" stroke="#6fd3ff" stroke-width="10" stroke-linecap="round" opacity="0.78"/>
 </svg>

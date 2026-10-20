@@ -91,3 +91,8 @@ HTML, CSS e JavaScript nativos, sem dependências externas. Armazenamento no nav
 O símbolo ao lado de **RITUAIS** agora é desenhado diretamente na página (SVG integrado), sem depender da imagem `assets/icone.svg`. Isso elimina a interrogação/ícone de imagem quebrada no Safari quando o arquivo não é carregado. Os ícones de instalação continuam na pasta `assets`.
 
 Substitua todos os arquivos do repositório pelos arquivos desta versão, mantendo o mesmo endereço do GitHub Pages. Antes da atualização, faça Backup completo.
+
+
+## Atualização do ícone no iPhone
+
+Se o atalho antigo na tela inicial do iPhone continuar mostrando o ícone anterior, apague o atalho antigo e adicione o RITUAIS novamente à tela inicial. O Safari pode manter o ícone anterior em cache mesmo após a atualização dos arquivos no GitHub Pages.

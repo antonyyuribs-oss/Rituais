@@ -141,30 +141,26 @@ function header(a,back='back'){return `<header class="topbar"><button type="butt
 function tilesActivity(action){return `<div class="tiles">${ACTIVITIES.map(a=>`<button type="button" class="tile activity-tile" data-action="${action}" data-id="${a.id}"><span class="tile-symbol">${icon(a.icon)}</span><span class="title">${esc(a.name)}</span></button>`).join('')}</div>`;}
 function renderHome(){return `<section class="brand-card"><div class="row brand-lockup"><span class="brand-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true" focusable="false" class="brand-logo-svg">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#111c31"/>
-      <stop offset="100%" stop-color="#355785"/>
+    <linearGradient id="ritualBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#14233c"/>
+      <stop offset="100%" stop-color="#32578b"/>
     </linearGradient>
-    <radialGradient id="glowA" cx="75%" cy="15%" r="55%">
-      <stop offset="0%" stop-color="#ffe6aa" stop-opacity="0.22"/>
-      <stop offset="100%" stop-color="#ffe6aa" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glowB" cx="15%" cy="85%" r="55%">
-      <stop offset="0%" stop-color="#83b8ff" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#83b8ff" stop-opacity="0"/>
+    <linearGradient id="ritualStroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f3d58f"/>
+      <stop offset="100%" stop-color="#f8e7bf"/>
+    </linearGradient>
+    <radialGradient id="ritualGlow" cx="28%" cy="18%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
   </defs>
-  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <rect width="512" height="512" rx="112" fill="url(#glowA)"/>
-  <rect width="512" height="512" rx="112" fill="url(#glowB)"/>
-  <circle cx="256" cy="256" r="164" fill="none" stroke="#e3c67d" stroke-width="14"/>
-  <circle cx="256" cy="256" r="116" fill="none" stroke="#ffffff" stroke-opacity=".28" stroke-width="6"/>
-  <path d="M198 192a58 58 0 0 1 116 0" fill="none" stroke="#f4efdf" stroke-width="20" stroke-linecap="round"/>
-  <path d="M198 250v118" fill="none" stroke="#f4efdf" stroke-width="20" stroke-linecap="round"/>
-  <path d="M314 250v118" fill="none" stroke="#f4efdf" stroke-width="20" stroke-linecap="round"/>
-  <path d="M214 388h84" fill="none" stroke="#e3c67d" stroke-width="12" stroke-linecap="round"/>
-  <path d="M227 410h58" fill="none" stroke="#e3c67d" stroke-width="10" stroke-linecap="round"/>
-  <path d="M256 180v36M238 198h36M244 186l24 24M268 186l-24 24" fill="none" stroke="#e3c67d" stroke-width="10" stroke-linecap="round"/>
+  <rect width="512" height="512" rx="116" fill="url(#ritualBg)"/>
+  <rect width="512" height="512" rx="116" fill="url(#ritualGlow)"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="url(#ritualStroke)" stroke-width="14" opacity="0.95"/>
+  <path d="M206 334V238c0-27 22-49 50-49s50 22 50 49v96" fill="none" stroke="#f7f1df" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M222 350h68" fill="none" stroke="url(#ritualStroke)" stroke-width="14" stroke-linecap="round"/>
+  <path d="M256 154v26M243 167h26M247 158l18 18M265 158l-18 18" fill="none" stroke="url(#ritualStroke)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M178 286c22 48 69 82 126 82 12 0 24-2 35-5" fill="none" stroke="#6fd3ff" stroke-width="10" stroke-linecap="round" opacity="0.78"/>
 </svg></span><h1 class="brand-title">RITUAIS</h1></div><button class="icon-button theme-trigger" type="button" data-action="open-themes" aria-label="Alterar cores" title="Alterar cores">${icon('palette')}</button></section><div class="tile-intro">${tilesActivity('start')}</div>`;}
 function renderRetro(){return `<div class="topbar"><button class="icon-button" data-action="back" aria-label="Voltar">${icon('back')}</button><strong class="activity-name">Novo registro</strong>${icon('clock','activity-icon')}</div>${tilesActivity('start-retro')}<p class="help mt">Data e horário poderão ser alterados no Histórico.</p>`;}
 function renderMoods(){const r=rec();if(!r)return renderHome();const a=ACT(r.activityId);const moods=activityMoods(a.id);return `${header(a)}<div class="tiles">${moods.map(m=>{const active=r.initialMoods.some(x=>x.id===m.id);return `<button type="button" class="tile mood-tile ${active?'active':''}" data-tone="${MOOD_TONES[m.name]||'violet'}" aria-pressed="${active}" data-action="toggle-initial-mood" data-id="${esc(m.id)}"><span class="tile-symbol">${icon(m.icon||MOOD_ICONS[m.name]||'circle')}</span><span class="title">${esc(m.name)}</span>${icon('check','checkmark')}</button>`;}).join('')}</div><div class="actions"><button class="btn" data-action="to-strategies" ${!r.initialMoods.length?'disabled':''}>Ver estratégias ${icon('right')}</button><button class="btn secondary" data-action="toggle-add-mood">${icon('plus')} Adicionar mood</button></div>${ui.addMood?moodEditorMarkup(null,'new'):''}<div class="mt-sm" style="text-align:center"><button class="muted-link" data-action="mood-manager">Gerenciar moods</button></div>`;}
