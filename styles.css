@@ -344,3 +344,301 @@ svg.icon{height:20px;width:20px;fill:none;stroke:currentColor;stroke-width:1.85;
 .theme-desc{font-size:11px;color:var(--mute)}
 @media(min-width:600px){.app-shell{min-height:100vh}.main{padding:34px 28px 32px}.tiles{gap:16px}.theme-fab{bottom:26px}}
 @media(max-width:350px){.main{padding-left:12px;padding-right:12px}.tile .title{font-size:13px}.calendar{gap:1px}.theme-options{grid-template-columns:1fr}}
+
+/* RITUAIS — segunda rodada de refinamento */
+:root{
+  --radius-panel:24px;
+  --radius-control:15px;
+  --ease: cubic-bezier(.2,.7,.2,1);
+}
+:root[data-theme="onyx"]{--accent-ink:#f5d99c}
+:root[data-theme="grafite"]{--accent-ink:#cee4ff}
+body{
+  font-feature-settings:"ss01" on;
+  letter-spacing:-.007em;
+}
+button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.main{
+  padding-bottom:34px;
+}
+.main.is-home{
+  justify-content:center;
+  gap:18px;
+}
+.brand-card{
+  padding:15px 16px;
+  border-radius:22px;
+  min-height:98px;
+  gap:12px;
+  box-shadow:0 16px 44px color-mix(in srgb,var(--ink) 7%,transparent);
+}
+.brand-lockup{min-width:0;gap:12px}
+.brand-mark{
+  width:60px;height:60px;border-radius:18px;
+  background:transparent;
+  box-shadow:0 8px 25px color-mix(in srgb,var(--ink) 17%,transparent);
+  overflow:hidden;
+  flex-shrink:0;
+}
+.brand-mark img{display:block;width:100%;height:100%;object-fit:cover}
+.brand-title{
+  font-size:clamp(22px,6vw,29px);
+  letter-spacing:.15em;
+  font-weight:850;
+  line-height:1.2;
+}
+.theme-trigger{width:43px;height:43px;border-radius:14px;box-shadow:none}
+.theme-trigger svg{width:21px;height:21px;color:var(--accent)}
+.tiles{gap:14px}
+.tile{
+  border-radius:24px;
+  gap:12px;
+  box-shadow:0 7px 20px color-mix(in srgb,var(--ink) 5%,transparent),0 1px 0 color-mix(in srgb,var(--paper-strong) 95%,transparent) inset;
+  transition:background .24s var(--ease),border-color .2s var(--ease),transform .22s var(--ease),box-shadow .22s var(--ease);
+}
+.tile:hover{transform:translateY(-2px);box-shadow:0 12px 24px color-mix(in srgb,var(--ink) 9%,transparent)}
+.tile:active{transform:scale(.975)}
+.tile-symbol{
+  width:64px;height:64px;display:grid;place-items:center;
+  border-radius:20px;
+  border:1px solid color-mix(in srgb,var(--accent) 14%,transparent);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--accent-soft) 63%,var(--paper-strong)),color-mix(in srgb,var(--tint) 50%,var(--paper-strong)));
+  color:var(--accent);
+  transition:transform .2s var(--ease),background .2s var(--ease);
+}
+.tile .tile-symbol svg.icon{width:35px;height:35px;color:inherit;stroke-width:1.65}
+.tile.active .tile-symbol{
+  color:var(--accent-ink);
+  border-color:color-mix(in srgb,var(--accent) 30%,transparent);
+  background:color-mix(in srgb,var(--accent-soft) 78%,var(--paper-strong));
+  transform:scale(1.035)
+}
+.tile .title{font-size:14px;font-weight:730;letter-spacing:-.01em}
+.tile .checkmark{right:11px;top:11px;width:20px;height:20px;stroke-width:2.5}
+.topbar{margin-bottom:17px}
+.topbar .activity-name{letter-spacing:-.025em}
+.icon-button{
+  box-shadow:none;
+  transition:background .2s var(--ease),transform .2s var(--ease);
+}
+.icon-button:hover{background:var(--tint)}
+.icon-button:active{transform:scale(.96)}
+.btn{
+  box-shadow:none;
+  font-weight:750;
+  transition:filter .16s ease,transform .16s var(--ease),box-shadow .16s ease;
+}
+.btn:not(:disabled):hover{filter:brightness(1.045);box-shadow:0 9px 18px color-mix(in srgb,var(--accent) 13%,transparent)}
+.btn:not(:disabled):active{transform:scale(.989)}
+.btn.secondary:hover{box-shadow:0 6px 14px color-mix(in srgb,var(--ink) 6%,transparent)}
+:root[data-theme="onyx"] .btn:not(.secondary):not(.light):not(.danger),
+:root[data-theme="grafite"] .btn:not(.secondary):not(.light):not(.danger){color:#182131}
+:root[data-theme="onyx"] .nav-item.active,
+:root[data-theme="grafite"] .nav-item.active{color:var(--accent-ink)}
+:root[data-theme="onyx"] .brand-card,
+:root[data-theme="grafite"] .brand-card,
+:root[data-theme="onyx"] .tile,
+:root[data-theme="grafite"] .tile,
+:root[data-theme="onyx"] .day,
+:root[data-theme="grafite"] .day,
+:root[data-theme="onyx"] .choice-btn,
+:root[data-theme="grafite"] .choice-btn{
+  background:linear-gradient(160deg,var(--paper-strong),var(--tint));
+  color:var(--ink);
+}
+:root[data-theme="onyx"] .tile.active,
+:root[data-theme="grafite"] .tile.active,
+:root[data-theme="onyx"] .choice-btn.selected,
+:root[data-theme="grafite"] .choice-btn.selected,
+:root[data-theme="onyx"] .day.selected,
+:root[data-theme="grafite"] .day.selected{
+  background:var(--accent-soft);
+  color:var(--accent-ink);
+  border-color:color-mix(in srgb,var(--accent) 55%,transparent);
+}
+:root[data-theme="onyx"] .tile-symbol,
+:root[data-theme="grafite"] .tile-symbol{
+  background:color-mix(in srgb,var(--accent-soft) 65%,var(--paper-strong));
+  color:var(--accent);
+}
+:root[data-theme="onyx"] .brand-mark,
+:root[data-theme="grafite"] .brand-mark{
+  box-shadow:0 7px 22px rgba(0,0,0,.27);
+}
+:root[data-theme="onyx"] .chip,
+:root[data-theme="grafite"] .chip{color:var(--accent-ink)}
+/* Roster of strategies — compact readable cards, phrase distinction and fixed action dock */
+.main.has-strategy-dock{padding-bottom:186px}
+.strategy-heading{
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  margin:19px 2px 10px;color:var(--mute);font-size:12px;font-weight:750;
+}
+.strategy-hint{font-size:11px;font-weight:550;text-align:right}
+.strategy-list{display:grid;gap:9px}
+.strategy-list .strategy-row{
+  min-height:62px;
+  padding:13px 13px 13px 16px;
+  border:1px solid var(--stroke);
+  border-radius:17px;
+  background:var(--paper-strong);
+  box-shadow:0 5px 14px color-mix(in srgb,var(--ink) 4%,transparent);
+  gap:12px;
+  position:relative;
+}
+.strategy-row.is-phrase{
+  border-color:color-mix(in srgb,var(--accent) 30%,var(--stroke));
+  background:linear-gradient(120deg,color-mix(in srgb,var(--accent-soft) 42%,var(--paper-strong)),var(--paper-strong));
+}
+.strategy-row.is-phrase::before{
+  content:"";position:absolute;top:13px;bottom:13px;left:0;
+  background:var(--accent);width:3px;border-radius:0 3px 3px 0;
+}
+.strategy-list .strategy-text{font-size:13.5px;line-height:1.53}
+.strategy-list .kind{color:var(--accent);letter-spacing:.075em;font-size:10px}
+.action-x{
+  width:44px;height:44px;
+  border-radius:13px;
+  background:var(--tint);
+  color:var(--mute);
+  transition:background .16s ease,color .16s ease;
+}
+.action-x:hover{background:color-mix(in srgb,var(--danger) 10%,var(--tint));color:var(--danger)}
+.strategy-editor-anchor{scroll-margin-block:28px 220px;margin-top:16px}
+.strategy-management{text-align:center;margin-top:12px}
+.strategy-dock{
+  position:fixed;
+  left:50%;
+  bottom:calc(80px + env(safe-area-inset-bottom,0px));
+  transform:translateX(-50%);
+  width:min(100%,500px);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  padding:13px 20px;
+  z-index:12;
+  background:var(--nav-bg);
+  border-top:1px solid var(--stroke);
+  border-inline:1px solid var(--stroke);
+  box-shadow:0 -12px 28px color-mix(in srgb,var(--ink) 6%,transparent);
+  backdrop-filter:blur(18px);
+}
+.strategy-dock .btn{
+  min-width:0;
+  min-height:50px;
+  padding-inline:7px;
+  border-radius:15px;
+  line-height:1.2;
+  font-size:13px;
+  white-space:normal;
+}
+.strategy-dock .btn svg{width:17px;height:17px;flex-shrink:0}
+.check-strategy.is-phrase{
+  border-radius:13px;
+  padding:12px 10px;
+  margin-top:9px;
+  background:color-mix(in srgb,var(--accent-soft) 34%,var(--paper-strong));
+  border-left:3px solid var(--accent);
+}
+.check-strategy.is-phrase .kind{color:var(--accent)}
+/* Calm calendar, visible markers and improved selected states */
+.calendar-head{margin-bottom:15px}
+.calendar-head strong{font-weight:820;letter-spacing:-.025em}
+.calendar-surface{
+  border:1px solid var(--stroke);
+  padding:10px 10px 12px;
+  border-radius:22px;
+  background:var(--paper-strong);
+  box-shadow:0 10px 28px color-mix(in srgb,var(--ink) 5%,transparent);
+}
+.calendar{gap:4px}
+.dow{height:34px;font-weight:790}
+.day{
+  box-shadow:none;
+  background:transparent;
+  border:1px solid transparent;
+  border-radius:13px;
+  gap:2px;
+  font-weight:570;
+  min-width:0;
+  transition:background .16s ease,border-color .16s ease;
+}
+.day:hover{background:var(--tint)}
+.day.today:not(.selected){border:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.day.selected{box-shadow:none}
+.day-dot{width:5px;height:5px;box-shadow:none;flex:none}
+.calendar-legend{
+  display:flex;align-items:center;justify-content:flex-end;gap:8px;
+  font-size:11px;color:var(--mute);margin:11px 3px 1px;
+}
+.calendar-legend .day-dot{width:6px;height:6px}
+.under-calendar{padding-top:18px;margin-top:20px}
+.day-record{
+  transition:background .16s ease,transform .16s ease,border-color .16s ease;
+  box-shadow:0 5px 14px color-mix(in srgb,var(--ink) 5%,transparent);
+}
+.day-record:hover{background:var(--tint);transform:translateY(-1px)}
+.record-info strong{font-size:13.5px}
+/* Feedback and smaller selections */
+.choice-btn{
+  box-shadow:none;
+  transition:background .16s ease,border-color .16s ease,transform .16s ease;
+}
+.choice-btn:active{transform:scale(.975)}
+.choice-btn.selected{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 18%,transparent)}
+.compact-grid .choice-btn{min-height:43px;font-size:12px;font-weight:650}
+.mood-mini-grid .choice-btn{min-height:45px;padding:6px 3px;overflow-wrap:anywhere}
+.yes-no .choice-btn{border-radius:18px}
+.details-toggle{box-shadow:none}
+.card{box-shadow:0 8px 22px color-mix(in srgb,var(--ink) 5%,transparent)}
+/* Undo snackbar */
+.toast{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  background:var(--ink);
+  color:var(--paper-strong);
+  width:min(calc(100vw - 32px),450px);
+  bottom:calc(168px + env(safe-area-inset-bottom,0px));
+  padding:12px 14px;
+  border:1px solid var(--stroke-strong);
+}
+.toast[hidden]{display:none}
+.toast-undo{
+  background:transparent;border:0;color:var(--accent-2);font-weight:850;font-size:13px;
+  padding:9px 3px;white-space:nowrap;text-decoration:underline;text-underline-offset:3px
+}
+:root[data-theme="onyx"] .toast,
+:root[data-theme="grafite"] .toast{background:#efefe8;color:#17212e}
+:root[data-theme="onyx"] .toast-undo{color:#84561c}
+:root[data-theme="grafite"] .toast-undo{color:#315e99}
+/* Modals */
+.theme-modal-card{border-radius:26px;box-shadow:0 24px 65px color-mix(in srgb,var(--ink) 20%,transparent)}
+.theme-option{box-shadow:none;transition:transform .15s ease,border-color .15s ease}
+.theme-option:hover{transform:translateY(-1px)}
+.theme-option.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.theme-name{font-weight:760}
+/* Buttons must work with actual touch targets */
+button[data-action="calendar-day"]{touch-action:manipulation}
+@media (max-width:380px){
+  .main{padding-inline:14px}
+  .brand-title{font-size:22px;letter-spacing:.11em}
+  .brand-mark{height:53px;width:53px;border-radius:17px}
+  .brand-card{min-height:86px;padding:13px}
+  .tiles{gap:10px}
+  .tile{border-radius:19px}
+  .tile-symbol{height:55px;width:55px;border-radius:17px}
+  .tile .tile-symbol svg.icon{height:30px;width:30px}
+  .strategy-dock{padding-inline:14px}
+  .strategy-dock .btn{font-size:12.5px}
+  .calendar-surface{padding:7px}
+  .calendar{gap:2px}
+  .calendar-head strong{font-size:18px}
+}
+@media (min-width:600px){
+  .main{padding-top:36px}
+  .strategy-dock{bottom:80px;padding-inline:27px}
+}
+@media(prefers-reduced-motion:reduce){
+  .tile,.tile-symbol,.btn,.icon-button,.choice-btn,.day,.day-record,.theme-option{transition:none!important}
+  *{scroll-behavior:auto!important}
+}
+/* Keep the fixed preparation dock anchored to the actual viewport (not the app-shell document height). */
+.app-shell{backdrop-filter:none}

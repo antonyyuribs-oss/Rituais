@@ -2,7 +2,17 @@
 
 Aplicativo web estático para identificar moods, selecionar estratégias de preparação, registrar execução e guardar feedback opcional.
 
-## Diferenciais desta versão
+## Refinamento visual — segunda rodada
+
+- Tela inicial com identidade RITUAIS e símbolo correspondente ao ícone do aplicativo.
+- Ícones das atividades e dos moods com acabamento visual padronizado.
+- Tela de estratégias com **Salvar preparação** e **Adicionar estratégia** acessíveis enquanto a lista rola.
+- Ao retirar uma estratégia pelo X, surge **Desfazer** por sete segundos; a remoção continua restrita ao registro atual.
+- Mensagens pessoais recebem tratamento visual discreto, sem mudar sua função.
+- Calendário, feedback, seleção de duração e contraste dos temas foram ajustados para celular.
+- O botão flutuante de temas foi removido; a paleta continua na página inicial.
+
+## Outras características
 
 - visual refinado, com aparência mais premium;
 - nome do app na página inicial: **RITUAIS**;
@@ -10,7 +20,14 @@ Aplicativo web estático para identificar moods, selecionar estratégias de prep
 - ícones de instalação atualizados para GitHub Pages e tela inicial do celular;
 - armazenamento local no navegador, com exportação e backup manual.
 
-## Publicar no GitHub Pages
+## Atualizar no GitHub Pages
+
+1. **Antes de atualizar**, abra o aplicativo atual e use **Histórico → Backup completo**; guarde o arquivo JSON.
+2. Substitua no mesmo repositório os arquivos `index.html`, `styles.css`, `app.js`, `manifest.webmanifest`, `README.md` e a pasta `assets` pelos do ZIP.
+3. Mantenha o **mesmo endereço do site GitHub Pages** e o mesmo navegador para preservar o armazenamento local.
+4. Aguarde a atualização do GitHub Pages e recarregue a página. Os arquivos CSS/JS usam uma nova versão no endereço para evitar cache antigo.
+
+## Publicar pela primeira vez
 
 1. Crie um repositório no GitHub.
 2. Envie **todo o conteúdo desta pasta** para a raiz do repositório: `index.html`, `styles.css`, `app.js`, `manifest.webmanifest`, `README.md` e a pasta `assets`.
@@ -32,7 +49,7 @@ Não é necessário instalar bibliotecas nem executar comandos de build.
 ## Funcionamento
 
 - **Início:** quatro atividades em quadrados → moods → todas as estratégias correspondentes → salvar preparação → marcar as executadas → feedback opcional → finalizar.
-- **Temas:** botão de paleta para trocar as cores do aplicativo.
+- **Temas:** botão de paleta na página inicial para trocar as cores do aplicativo.
 - **Histórico:** calendário. Ao abrir, exportação e backup aparecem abaixo do calendário. Toque em um dia para ver os registros; toque no mesmo dia de novo para retornar aos botões de exportação.
 - **Registro retroativo:** no calendário, use o botão `+` no cabeçalho; escolha a atividade e ajuste data e horário nos detalhes do registro.
 - **Edição:** abra um registro no calendário. Todos os campos e estratégias daquele registro podem ser ajustados; registros finalizados continuam editáveis.
