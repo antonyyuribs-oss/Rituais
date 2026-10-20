@@ -670,7 +670,7 @@ button[data-action="calendar-day"]{touch-action:manipulation}
 /* Brand icon drawn inline; no external image request on Safari. */
 .brand-mark .brand-logo-svg {display:block;width:100%;height:100%;flex:none}
 
-/* RITUAIS v5 — multicolor accents, purposeful color hierarchy across every theme */
+/* RITUAIS v7 — multicolor accents, purposeful color hierarchy across every theme */
 :root[data-theme="classico"]{
  --work-accent:#bb7536;--train-accent:#158d85;--food-accent:#c56564;--sleep-accent:#8469c6;
  --mood-cool:#4279bf;--mood-warm:#cc7358;--mood-violet:#8066c4;--mood-fresh:#168f80;--mood-gold:#bc822b;
@@ -831,3 +831,6 @@ body[data-activity] .chip{
 :root[data-theme] .theme-preview .p3{background:var(--swatch-3);height:92%}
 :root[data-theme] .theme-preview .p4{background:color-mix(in srgb,var(--swatch-1) 40%,var(--swatch-3));height:67%}
 @media(prefers-reduced-motion:reduce){:root[data-theme] .activity-tile{transition:none}}
+
+/* v7: identificação discreta para conferir a publicação */
+.version-note{font-size:11px;color:var(--mute);margin:5px 0 0;letter-spacing:.025em}

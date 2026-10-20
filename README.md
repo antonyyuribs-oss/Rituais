@@ -1,8 +1,8 @@
-# RITUAIS — versão 5
+# RITUAIS — versão 7
 
 Aplicativo web estático para identificar moods, selecionar estratégias de preparação, registrar execução e guardar feedback opcional.
 
-## Novidades da versão 5
+## Novidades da versão 7
 
 - **Excluir registro:** Histórico → dia → registro → **Excluir registro** (na parte inferior). A exclusão exige confirmação e não modifica os outros registros ou estratégias permanentes.
 - **Importar histórico (JSON):** Histórico → **Importar histórico (JSON)**, logo abaixo de **Exportar Histórico (JSON)**. Aceita arquivos produzidos por **Exportar Histórico** neste app. A importação **acrescenta** registros, ignora IDs já existentes, mantém as preferências, moods e estratégias atuais e abre o dia mais recente importado. Não restaura configurações ou repertórios.
@@ -23,7 +23,7 @@ Aplicativo web estático para identificar moods, selecionar estratégias de prep
 - Calendário, feedback, seleção de duração e contraste dos temas foram ajustados para celular.
 - O botão flutuante de temas foi removido; a paleta continua na página inicial.
 
-## Temas desta versão
+## Temas da versão 7
 
 - **Azul Clássico** — claro
 - **Ônix Dourado** — escuro
@@ -48,7 +48,7 @@ Aplicativo web estático para identificar moods, selecionar estratégias de prep
 1. **Antes de atualizar**, abra o aplicativo atual e use **Histórico → Backup completo**; guarde o arquivo JSON.
 2. Substitua no mesmo repositório os arquivos `index.html`, `styles.css`, `app.js`, `manifest.webmanifest`, `README.md` e a pasta `assets` pelos do ZIP.
 3. Mantenha o **mesmo endereço do site GitHub Pages** e o mesmo navegador para preservar o armazenamento local.
-4. Aguarde a atualização do GitHub Pages e recarregue a página. Os arquivos CSS/JS usam uma nova versão no endereço para evitar cache antigo.
+4. Aguarde a atualização do GitHub Pages e recarregue a página. Os arquivos CSS/JS usam `?v=7` nos endereços para evitar cache antigo.
 
 ## Publicar pela primeira vez
 
@@ -96,3 +96,14 @@ Substitua todos os arquivos do repositório pelos arquivos desta versão, manten
 ## Atualização do ícone no iPhone
 
 Se o atalho antigo na tela inicial do iPhone continuar mostrando o ícone anterior, apague o atalho antigo e adicione o RITUAIS novamente à tela inicial. O Safari pode manter o ícone anterior em cache mesmo após a atualização dos arquivos no GitHub Pages.
+
+
+## Como confirmar que a versão 7 foi publicada
+
+1. No repositório GitHub, abra `README.md`: o título deve mostrar **RITUAIS — versão 7**.
+2. Abra `index.html` no GitHub: as referências devem ser `styles.css?v=7` e `app.js?v=7`.
+3. Após atualizar o GitHub Pages, abra o site no Safari adicionando `?v=7` ao final do endereço da página.
+4. Dentro do aplicativo, abra a paleta de cores: deverá aparecer **RITUAIS · versão 7**.
+5. Se o ícone do atalho do iPhone não atualizar, remova o atalho antigo da tela inicial e adicione novamente pelo Safari. O ícone mudou de caminho para `assets/rituais-iphone-v7.png` para evitar o cache anterior.
+
+**Importante:** não envie apenas o arquivo ZIP ao repositório. Extraia o ZIP e substitua **todos os arquivos e a pasta `assets`** na raiz do repositório. As mudanças de aparência não alteram o armazenamento local do aplicativo, mas faça antes um backup completo.
