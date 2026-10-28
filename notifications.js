@@ -54,7 +54,7 @@
  function upcoming(briefings){
   const now=Date.now(),out=[],datePattern=/^\d{4}-\d\d-\d\d$/;
   for(const b of briefings||[]){
-   if(!datePattern.test(b.date))continue;
+   if(!datePattern.test(b.date)||!b.savedAt)continue;
    for(const [aid,sec] of Object.entries(b.activities||{})){
     if(!['work','train','food','sleep'].includes(aid))continue;
     for(const st of sec.strategies||[]){

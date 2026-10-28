@@ -973,3 +973,21 @@ body[data-activity] .chip{
 .strategy-confront{display:block;font-size:11px;line-height:1.4;color:var(--mute);font-style:italic;margin-top:5px}
 .brief-target{box-shadow:0 0 0 2px var(--accent);scroll-margin-top:80px}
 .brief-delay{border:1px solid var(--stroke);border-radius:7px;background:var(--paper-soft);color:var(--ink-soft);font-size:11px;padding:7px 9px;cursor:pointer}
+
+/* v14 — Briefing editado separadamente do plano salvo e dos registros históricos. */
+.brief-mode-notice{display:flex;flex-direction:column;gap:6px;margin:0 0 13px;padding:13px 14px;background:var(--tint-strong);border:1px solid var(--stroke-strong);border-radius:13px;font-size:12px;line-height:1.5}
+.brief-mode-notice strong{font-size:13px;color:var(--ink)}.brief-mode-notice span{color:var(--ink-soft)}
+.brief-mode-notice.saved{background:var(--paper-strong)}
+.brief-edit-actions{display:grid;grid-template-columns:1.5fr 1fr;gap:9px;margin:0 0 15px}
+.brief-edit-actions .btn{font-size:12px;padding:12px 9px}
+.brief-edit-top{display:flex;justify-content:center;width:100%;margin:0 0 15px;font-size:13px}
+.brief-read-content{padding-top:3px}.brief-mood-summary{color:var(--ink-soft);font-size:12px;line-height:1.6;margin:13px 0}
+.brief-picked-list{display:flex;flex-direction:column;gap:9px;padding:4px 0 11px}
+.brief-picked-item{display:grid;grid-template-columns:16px minmax(0,1fr);gap:7px;padding:10px 9px;border-radius:10px;background:var(--paper-soft)}
+.brief-picked-dot{color:var(--brief-accent)}.brief-picked-dot .icon{width:13px;height:13px}
+.brief-picked-item strong{font-size:12px;color:var(--brief-accent)}
+.brief-picked-item p{font-size:12px;line-height:1.5;color:var(--ink);margin:4px 0}
+.brief-picked-item small{display:flex;gap:5px;align-items:center;font-size:11px;color:var(--mute)}.brief-picked-item small .icon{width:12px;height:12px}
+.brief-card-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:5px 0 9px}.brief-card-actions .btn{font-size:11px;min-height:42px;padding:9px 5px}
+.brief-record-btn{background:var(--accent)}
+@media(max-width:370px){.brief-edit-actions .btn,.brief-card-actions .btn{font-size:10.5px}}

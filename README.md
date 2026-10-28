@@ -1,3 +1,54 @@
+# RITUAIS v15 — Salvar Briefing gera Histórico
+
+## Alteração solicitada
+
+Ao tocar **Salvar Briefing**, o RITUAIS grava o plano do dia e cria um **registro com status Planejado para cada atividade com moods ou estratégias selecionados**. Essas entradas aparecem imediatamente no calendário do Histórico, ainda que a atividade não tenha ocorrido. Salvar planejamento NÃO equivale a executar estratégias nem a realizar a atividade.
+
+- O registro planejado guarda os moods e as estratégias selecionadas, inicialmente **não executadas**, e sem resultado da atividade.
+- Ao tocar na atividade do Briefing salvo, abre **o mesmo registro**, agora para marcar execuções e o resultado; não cria outro registro.
+- O registro criado pelo planejamento aparece em Histórico com status **Planejado**. Depois de começar a registrar, passa a **Em andamento** e pode ser finalizado.
+- **Editar Briefing** permanece disponível. Ao salvar alterações, estratégias planejadas ainda não executadas são atualizadas no registro pendente; estratégias já executadas e inserções manuais não são apagadas. Um registro finalizado não é reescrito pela edição do plano.
+- Se uma atividade foi totalmente retirada do Briefing antes de qualquer execução, o registro planejado fica assinalado **Plano retirado** (não contabilizado como atividade não realizada).
+- Os registros antigos da v14 são preservados. Planos v14 já salvos, mas sem registro vinculado, ganham registros de planejamento automaticamente após abrir a v15. Não são gerados registros para atividades completamente vazias.
+- **Último registro** continua priorizando eventos registrados de fato, não apenas os planos pendentes que foram criados automaticamente.
+
+## Atualização
+
+1. **Faça backup completo do RITUAIS atual** antes de atualizar.
+2. Extraia o ZIP e envie todos os arquivos (incluindo `app.js`, `index.html`, `styles.css` e pastas) à raiz do GitHub Pages.
+3. Mantenha seu `push-config.js` personalizado caso já tenha configurado o Web Push; o arquivo distribuído é apenas um exemplo.
+4. Não limpe os dados locais do navegador: a mesma chave `rituais_app_v3` preserva registros, estratégias e briefings.
+
+O serviço de notificações push externo continua dependente da configuração pessoal do Supabase e de teste no iPhone.
+
+---
+
+# RITUAIS v14 — Briefing salvo, consulta diária e registro por atividade
+
+Esta versão é uma atualização da v13, mantendo o catálogo de 72 estratégias, os modos Registrar/Preparar, o Histórico, os temas e a infraestrutura de Web Push. As credenciais do Supabase continuam opcionais e **não estão incluídas**.
+
+## Novidade: a diferença entre planejar e registrar
+
+1. Na página inicial, abra **Briefing Diário**. Escolha moods, estratégias e horários das quatro atividades, conforme desejar.
+2. Toque **Salvar Briefing**. A partir daí, o plano do dia aparece em modo de **visualização**, mostrando **somente as estratégias selecionadas** (e os moods selecionados, quando houver). O plano continua disponível para consulta e pode ser editado novamente com **Editar Briefing**.
+3. **Tocar uma atividade do plano salvo abre seu registro**. O primeiro toque cria um registro da atividade no Histórico. O mesmo botão, nos acessos seguintes, retoma ou abre o registro vinculado, sem duplicá-lo.
+4. Dentro do registro, marque **somente as estratégias efetivamente executadas**, avalie sua utilidade se quiser, informe se realizou a atividade e toque **Salvar registro**. O resultado é gravado no Histórico e você volta ao Briefing.
+5. Selecionar uma estratégia no planejamento **não** significa que ela foi executada: salvar o plano não cria registro de execução. Os registros anteriores permanecem como fotografias do que foi registrado naquele momento, mesmo que você edite o plano depois.
+6. Durante a edição, mudanças ficam em rascunho até tocar **Salvar Briefing**. **Cancelar edição** descarta as mudanças não salvas. A edição de um dia anterior continua possível pelo seletor de data.
+7. As notificações são agendadas ao salvar o Briefing; marcar uma estratégia como executada no registro remove-a dos futuros lembretes pendentes na próxima sincronização, sem reescrever o plano salvo.
+
+## Atualização da v13
+
+- **Antes de substituir os arquivos, faça Backup completo na v13 e guarde o JSON.** Não apague dados do navegador.
+- Extraia este ZIP e envie o **conteúdo da pasta** à raiz do repositório do GitHub Pages. Substitua `index.html`, `app.js`, `styles.css`, `notifications.js`, `manifest.webmanifest` e os demais arquivos distribuídos.
+- Os dados continuam sob a mesma chave de armazenamento local `rituais_app_v3`, sem limpeza do Histórico. Briefings já existentes na v13, que ainda não têm o campo `savedAt`, serão apresentados em modo de edição para você revisar e salvar explicitamente. As estratégias e os registros existentes não são apagados.
+- Um briefing rascunhado e **não salvo** não é publicado como plano do dia e é descartado ao sair da edição. O modo de consulta é exibido após o salvamento.
+- **Se o push já estiver funcionando na v13, não substitua seu `push-config.js` personalizado pelo arquivo de exemplo deste ZIP.** Mantenha as credenciais públicas configuradas do seu projeto. Publicar a v14 **não** configura automaticamente o Supabase, o serviço agendador ou as permissões do iPhone.
+
+---
+
+## Documentação técnica herdada da v13
+
 # RITUAIS v13 — Briefing Diário + catálogo Goggins + infraestrutura Web Push
 
 Versão pronta para publicar como aplicativo estático no GitHub Pages **e** preparada para a integração de notificações via Supabase. **O push não funciona até configurar um projeto Supabase, implantar a Edge Function e permitir as notificações no iPhone.** O pacote não contém credenciais privadas, e nada foi implantado em uma conta externa automaticamente.

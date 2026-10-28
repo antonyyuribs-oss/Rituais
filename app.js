@@ -184,7 +184,7 @@ function rec(){return db.records.find(x=>x.id===ui.recordId)||null;}
 function activityMoods(id,activeOnly=true){return (db.moods[id]||[]).filter(m=>!activeOnly||m.active);}
 function moodName(id,moods){return (moods||[]).find(m=>m.id===id)?.name||activityMoods(rec()?.activityId||'work',false).find(m=>m.id===id)?.name||'';}
 function moodsMarkup(ids,activityId){if(!ids?.length)return '<span class="subtle">Não informado</span>';return `<div class="chip-wrap">${ids.map(m=>`<span class="chip">${esc(m.name||activityMoods(activityId,false).find(x=>x.id===m.id)?.name||'Mood')}</span>`).join('')}</div>`;}
-function touch(r){r.updatedAt=new Date().toISOString();persist();}
+function touch(r){r.updatedAt=new Date().toISOString();persist();if(r.briefingOrigin)window.RituaisPush?.queueSync?.(briefPushSnapshot());}
 function newRecord(activityId,date='',time=null,entryMode='preparacao'){const now=nowLocal();const entry={id:uid(),activityId,date:date||now.date,time:time===null?now.time:time,entryMode,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'andamento',initialMoods:[],duringMoods:[],finalMoods:[],excludedStrategyIds:[],preventionSelectedIds:[],temporaryStrategies:[],strategies:[],preparationSaved:false,result:null,durationMinutes:null,notes:''};briefFromExisting(activityId,entry);db.records.push(entry);persist();ui.recordId=entry.id;ui.view=entryMode==='registro'?'quick':'moods';ui.quickDetails=false;ui.quickExpanded=false;ui.quickTiming='agora';ui.strategyTiming='agora';ui.addMood=false;ui.retro=false;render();}
 function view(name){ui.view=name;ui.addMood=false;ui.addingStrategy=false;ui.editStrategyId=null;ui.editMoodId=null;render();}
 function setTab(name){if(name==='history'){ui.historyDay=null;const now=nowLocal().date;ui.historyMonth=Number(now.slice(5,7))-1;ui.historyYear=Number(now.slice(0,4));}ui.recordId=null;ui.retro=false;view(name);}
@@ -198,6 +198,7 @@ function renderMoods(){const r=rec();if(!r)return renderHome();const a=ACT(r.act
 function moodEditorMarkup(m,scope){return `<form class="form-card mt-sm" data-form="save-mood" data-scope="${scope}" ${m?`data-id="${esc(m.id)}"`:''}><label class="form-label">${m?'Editar mood':'Novo mood'}<input name="name" maxlength="45" placeholder="Nome do mood" value="${esc(m?.name||'')}" required autocomplete="off"></label><div class="split"><button type="submit" class="btn">Salvar</button><button type="button" class="btn secondary" data-action="cancel-edit">Cancelar</button></div></form>`;}
 
 function quickOptions(r){
+  if(r.briefingOrigin){return (r.strategies||[]).map(s=>({id:s.sourceId||s.id,text:s.text,kind:s.kind,timing:s.timing||'agora'}));}
   const seen=new Set(),options=[];
   for(const s of db.strategies.filter(s=>s.active&&s.activityId===r.activityId)){
     const key=nameKey(s.text);if(seen.has(key))continue;seen.add(key);options.push(s);
@@ -217,10 +218,10 @@ function quickRating(r,s){return r.strategies.find(x=>x.done&&(x.sourceId===s.id
 function quickItem(r,s){const checked=quickChecked(r,s);const st=checked?quickRating(r,s):null;return `<div class="quick-item ${checked?'checked':''}"><label class="quick-check"><input type="checkbox" data-action="quick-check" data-id="${esc(s.id)}" ${checked?'checked':''}><span>${esc(s.text)}</span></label>${checked?`<div class="quick-rating" aria-label="Avaliação da estratégia">${[['yes','Ajudou'],['no','Não ajudou'],['unsure','Não sei']].map(([v,label])=>`<button class="quick-rating-btn ${st?.helped===(v==='yes'?true:v==='no'?false:'incerto')?'active':''}" data-action="quick-rate" data-id="${esc(st.id)}" data-value="${v}" type="button">${label}</button>`).join('')}</div>`:''}</div>`;}
 function renderQuick(){
  const r=rec();if(!r)return renderHome();const a=ACT(r.activityId);
- const opts=quickOptions(r).filter(x=>(x.timing||'agora')===ui.quickTiming),visible=ui.quickExpanded?opts:opts.slice(0,6);
+ const opts=quickOptions(r).filter(x=>r.briefingOrigin||((x.timing||'agora')===ui.quickTiming)),visible=r.briefingOrigin?opts:ui.quickExpanded?opts:opts.slice(0,6);
  return `${header(a,'back')}<div class="quick-legend"><span class="pill">Registro rápido</span><span class="subtle small">Preencha apenas o que quiser</span></div>
  <div class="split quick-datetime"><div class="field"><label class="form-label" for="date-field">Data</label><input id="date-field" type="date" data-field="date" value="${esc(r.date)}"></div><div class="field"><label class="form-label" for="time-field">Horário</label><input id="time-field" type="time" data-field="time" value="${esc(r.time||'')}"></div></div>
- <div class="timing-tabs" role="group" aria-label="Momento da preparação"><button class="timing-tab ${ui.quickTiming==='agora'?'active':''}" data-action="quick-timing" data-value="agora">Antes de iniciar</button><button class="timing-tab ${ui.quickTiming==='antes'?'active':''}" data-action="quick-timing" data-value="antes">Com antecedência</button></div><div class="quick-label-row"><h2 class="heading">Estratégias utilizadas</h2><span class="subtle small">${r.strategies.filter(s=>s.done).length} marcadas</span></div>
+ ${r.briefingOrigin?'':`<div class="timing-tabs" role="group" aria-label="Momento da preparação"><button class="timing-tab ${ui.quickTiming==='agora'?'active':''}" data-action="quick-timing" data-value="agora">Antes de iniciar</button><button class="timing-tab ${ui.quickTiming==='antes'?'active':''}" data-action="quick-timing" data-value="antes">Com antecedência</button></div>`}<div class="quick-label-row"><h2 class="heading">${r.briefingOrigin?'Estratégias do Briefing':'Estratégias utilizadas'}</h2><span class="subtle small">${r.strategies.filter(s=>s.done).length} marcadas</span></div>
  <div class="quick-list">${visible.map(s=>quickItem(r,s)).join('')}${!opts.length?'<p class="empty">Adicione uma estratégia abaixo.</p>':''}</div>
  ${opts.length>6?`<button class="muted-link quick-more" type="button" data-action="quick-expand">${ui.quickExpanded?'Mostrar menos':'Ver todas as estratégias ('+opts.length+')'}</button>`:''}
  <form class="quick-add" data-form="quick-add"><label class="form-label" for="quick-new">Outra estratégia utilizada</label><div class="quick-add-row"><input id="quick-new" name="text" maxlength="500" placeholder="Escreva e adicione" required><button class="btn compact" type="submit" aria-label="Adicionar estratégia">${icon('plus')}</button></div></form>
@@ -229,7 +230,11 @@ function renderQuick(){
  ${ui.quickDetails?`<div class="quick-details"><div class="field"><label class="form-label">Mood na ocasião</label>${moodSelectMini(r.activityId,r.initialMoods,'edit-initial')}</div><div class="field"><label class="form-label">Mood ao finalizar</label>${moodSelectMini(r.activityId,r.finalMoods,'final')}</div><div class="field"><label class="form-label">Duração</label>${durationMarkup(r)}</div><div class="field"><label class="form-label" for="notes">Observações</label><textarea id="notes" maxlength="3000" rows="3" placeholder="Opcional">${esc(r.notes||'')}</textarea></div></div>`:''}
  <div class="actions quick-final"><button class="btn" data-action="finish">${icon('check')} Salvar registro</button></div>`;
 }
-function toggleQuickStrategy(sourceId){const r=rec();if(!r)return;const s=quickOptions(r).find(x=>x.id===sourceId);if(!s)return;const item=r.strategies.find(x=>x.sourceId===s.id||nameKey(x.text)===nameKey(s.text));if(item){r.strategies=r.strategies.filter(x=>x!==item);}else{r.strategies.push({id:uid(),sourceId:s.id,text:s.text,kind:s.kind||'acao',timing:s.timing||'agora',done:true,helped:null});}touch(r);render();}
+function toggleQuickStrategy(sourceId){const r=rec();if(!r)return;const s=quickOptions(r).find(x=>x.id===sourceId);if(!s)return;const item=r.strategies.find(x=>x.sourceId===s.id||nameKey(x.text)===nameKey(s.text));
+ if(item&&r.briefingOrigin){item.done=!item.done;if(!item.done)item.helped=null;}
+ else if(item){r.strategies=r.strategies.filter(x=>x!==item);}
+ else{r.strategies.push({id:uid(),sourceId:s.id,text:s.text,kind:s.kind||'acao',timing:s.timing||'agora',done:true,helped:null});}
+ touch(r);render();}
 function renderMoodManager(){const r=rec();if(!r)return renderHome();const a=ACT(r.activityId);return `${header(a,'to-moods')}<h2 class="heading">Gerenciar moods</h2><div class="mt">${activityMoods(a.id,false).map(m=>`<div class="manager-item"><div class="row between"><div class="grow"><strong class="text-sm">${esc(m.name)}</strong> ${!m.active?'<span class="tag">Oculto</span>':''}</div><div class="inline-actions"><button type="button" class="btn tiny secondary compact" data-action="edit-mood" data-id="${esc(m.id)}">Editar</button><button type="button" class="btn tiny ${m.active?'danger':'secondary'} compact" data-action="toggle-mood-active" data-id="${esc(m.id)}">${m.active?'Ocultar':'Restaurar'}</button></div></div>${ui.editMoodId===m.id?moodEditorMarkup(m,'manager'):''}</div>`).join('')}</div><div class="actions"><button class="btn secondary" data-action="manager-add-mood">${icon('plus')} Adicionar mood</button></div>${ui.addMood?moodEditorMarkup(null,'manager'):''}`;}
 function matchingStrategies(r,timing){
   const ids=new Set(r.initialMoods.map(m=>m.id));
@@ -284,10 +289,10 @@ function renderFeedback(){const r=rec();if(!r)return renderHome();const a=ACT(r.
 function calendarRows(){const year=ui.historyYear,month=ui.historyMonth;const off=(new Date(year,month,1).getDay()+6)%7;const count=new Date(year,month+1,0).getDate();const num=Math.ceil((off+count)/7)*7;const marked=new Set(db.records.map(r=>r.date));const dt=d=>`${year}-${pad(month+1)}-${pad(d)}`;
  return `<div class="calendar">${['S','T','Q','Q','S','S','D'].map(x=>`<span class="dow">${x}</span>`).join('')}${Array.from({length:num},(_,i)=>{const d=i-off+1;if(d<=0||d>count)return '<div aria-hidden="true"></div>';const selected=ui.historyDay===d;const isToday=nowLocal().date===dt(d);return `<button class="day ${selected?'selected':''} ${isToday?'today':''}" data-action="calendar-day" data-value="${d}" aria-pressed="${selected}" ${isToday?'aria-current="date"':''} aria-label="${d} de ${MONTHS[month]}${marked.has(dt(d))?', com registros':''}"><span>${d}</span>${marked.has(dt(d))?'<span class="day-dot"></span>':'<span class="day-blank"></span>'}</button>`}).join('')}</div>`;}
 function sortedDayRecords(){if(ui.historyDay===null)return [];const day=`${ui.historyYear}-${pad(ui.historyMonth+1)}-${pad(ui.historyDay)}`;return db.records.filter(r=>r.date===day).sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99')||a.createdAt.localeCompare(b.createdAt));}
-function renderHistory(){const selected=ui.historyDay;const dayRecords=sortedDayRecords();return `<header class="calendar-head"><button class="icon-button" data-action="prev-month" aria-label="Mês anterior">${icon('left')}</button><strong>${MONTHS[ui.historyMonth]} ${ui.historyYear}</strong><div class="row" style="gap:0"><button class="icon-button" data-action="new-retro" aria-label="Adicionar registro anterior" title="Adicionar registro">${icon('plus')}</button><button class="icon-button" data-action="next-month" aria-label="Próximo mês">${icon('right')}</button></div></header><section class="calendar-surface">${calendarRows()}<div class="calendar-legend"><span class="day-dot"></span><span>Dias com registros</span></div></section><section class="under-calendar">${selected===null?`<div class="actions" style="margin-top:0"><button class="btn secondary" data-action="export-history">${icon('download')} Exportar Histórico (JSON)</button><button class="btn secondary import-history-action" data-action="import-history">${icon('upload')} Importar histórico (JSON)</button><button class="btn secondary" data-action="export-backup">${icon('archive')} Backup completo</button><button class="btn secondary" data-action="restore-backup">${icon('upload')} Restaurar backup</button></div>`:`<div class="row between" style="margin-bottom:14px"><strong class="text-sm">${selected} de ${MONTHS[ui.historyMonth].toLowerCase()}</strong><span class="subtle small">${dayRecords.length} ${dayRecords.length===1?'registro':'registros'}</span></div>${dayRecords.map(r=>{const a=ACT(r.activityId);return `<button type="button" class="day-record" data-action="open-record" data-id="${esc(r.id)}"><span class="record-icon">${icon(a.icon)}</span><span class="record-info"><strong>${esc(a.name)}</strong><small>${r.time||'Sem horário'} · ${r.status==='finalizado'?'Finalizado':'Em andamento'}</small></span>${icon('right')}</button>`;}).join('')||'<p class="empty">Nenhum registro neste dia.</p>'}`}</section>`;}
+function renderHistory(){const selected=ui.historyDay;const dayRecords=sortedDayRecords();return `<header class="calendar-head"><button class="icon-button" data-action="prev-month" aria-label="Mês anterior">${icon('left')}</button><strong>${MONTHS[ui.historyMonth]} ${ui.historyYear}</strong><div class="row" style="gap:0"><button class="icon-button" data-action="new-retro" aria-label="Adicionar registro anterior" title="Adicionar registro">${icon('plus')}</button><button class="icon-button" data-action="next-month" aria-label="Próximo mês">${icon('right')}</button></div></header><section class="calendar-surface">${calendarRows()}<div class="calendar-legend"><span class="day-dot"></span><span>Dias com registros</span></div></section><section class="under-calendar">${selected===null?`<div class="actions" style="margin-top:0"><button class="btn secondary" data-action="export-history">${icon('download')} Exportar Histórico (JSON)</button><button class="btn secondary import-history-action" data-action="import-history">${icon('upload')} Importar histórico (JSON)</button><button class="btn secondary" data-action="export-backup">${icon('archive')} Backup completo</button><button class="btn secondary" data-action="restore-backup">${icon('upload')} Restaurar backup</button></div>`:`<div class="row between" style="margin-bottom:14px"><strong class="text-sm">${selected} de ${MONTHS[ui.historyMonth].toLowerCase()}</strong><span class="subtle small">${dayRecords.length} ${dayRecords.length===1?'registro':'registros'}</span></div>${dayRecords.map(r=>{const a=ACT(r.activityId);return `<button type="button" class="day-record" data-action="open-record" data-id="${esc(r.id)}"><span class="record-icon">${icon(a.icon)}</span><span class="record-info"><strong>${esc(a.name)}</strong><small>${r.time||((r.briefingAutoCreated&&r.briefingSavedAt)?'Salvo '+new Date(r.briefingSavedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'Sem horário')} · ${briefHistoryState(r)}</small></span>${icon('right')}</button>`;}).join('')||'<p class="empty">Nenhum registro neste dia.</p>'}`}</section>`;}
 function showStrategyStatuses(r,editable){return r.strategies.length?r.strategies.map(s=>`<div class="strategy-row"><div class="grow"><label class="checkbox-line" style="align-items:flex-start"><input type="checkbox" ${s.done?'checked':''} data-action="edit-strategy-done" data-id="${esc(s.id)}" ${editable?'':'disabled'}><span class="strategy-text">${esc(s.text)}</span></label>${s.done&&editable?`<div class="inline-actions mt-sm"><button class="btn tiny compact ${s.helped===true?'light':'secondary'}" data-action="rate" data-id="${esc(s.id)}" data-value="yes">Ajudou</button><button class="btn tiny compact ${s.helped===false?'light':'secondary'}" data-action="rate" data-id="${esc(s.id)}" data-value="no">Não ajudou</button><button class="btn tiny compact ${s.helped==='incerto'?'light':'secondary'}" data-action="rate" data-id="${esc(s.id)}" data-value="unsure">Não sei</button></div>`:s.done?`<span class="quick-eval">${s.helped===true?'Ajudou':s.helped===false?'Não ajudou':s.helped==='incerto'?'Não sei':'Não avaliada'}</span>`:''}</div>${editable?`<button class="action-x" data-action="edit-historical-strategy" data-id="${esc(s.id)}" title="Editar texto neste registro" aria-label="Editar estratégia">${icon('pencil')}</button><button class="action-x" data-action="remove-historical-strategy" data-id="${esc(s.id)}" title="Retirar deste registro" aria-label="Retirar deste registro">${icon('x')}</button>`:''}</div>`).join(''):'<p class="subtle small">Nenhuma estratégia registrada.</p>';}
-function renderRecord(){const r=rec();if(!r)return renderHistory();const a=ACT(r.activityId);const editing=ui.view==='record-edit';return `${header(a,'back-record')}<div class="row between" style="margin-bottom:17px"><span class="pill ${r.status==='finalizado'?'ok':''}">${r.status==='finalizado'?'Finalizado':'Em andamento'} · ${r.entryMode==='registro'?'Registro rápido':'Preparação'}</span><button class="btn compact secondary" data-action="toggle-edit-record">${icon('pencil')} ${editing?'Concluir edição':'Editar'}</button></div>${editing?renderEditRecord(r):renderReadRecord(r)}<div class="actions">${r.status==='andamento'?`<button class="btn" data-action="resume-record">Continuar registro</button><button class="btn secondary" data-action="finish-record">Finalizar sem feedback</button>`:`<button class="btn secondary" data-action="reopen-record">Reabrir registro</button>`}</div><div class="danger-zone"><button type="button" class="btn danger" data-action="delete-record">${icon('trash')} Excluir registro</button></div>`;}
-function renderReadRecord(r){return `<div class="card soft"><div class="info-row"><span class="key">Data</span><span class="value">${esc(shortDate(r.date))}</span></div><div class="info-row"><span class="key">Hora</span><span class="value">${esc(r.time||'Não informado')}</span></div><div class="info-row"><span class="key">Iniciou a atividade?</span><span class="value">${r.result==='sim'?'Sim':r.result==='nao'?'Não':'Não informado'}</span></div>${r.durationMinutes!=null?`<div class="info-row"><span class="key">Duração</span><span class="value">${formatMinutes(r.durationMinutes)}</span></div>`:''}<hr class="line"><div class="field"><span class="form-label">Mood na preparação</span>${moodsMarkup(r.initialMoods,r.activityId)}</div><div class="field"><span class="form-label">Mood durante</span>${moodsMarkup(r.duringMoods,r.activityId)}</div><div class="field"><span class="form-label">Mood ao finalizar</span>${moodsMarkup(r.finalMoods,r.activityId)}</div><div class="field" style="margin-bottom:0"><span class="form-label">Estratégias</span>${showStrategyStatuses(r,false)}</div>${r.notes?`<hr class="line"><div class="form-label">Observações</div><div class="text-sm">${esc(r.notes).replace(/\n/g,'<br>')}</div>`:''}</div>`;}
+function renderRecord(){const r=rec();if(!r)return renderHistory();const a=ACT(r.activityId);const editing=ui.view==='record-edit';return `${header(a,'back-record')}<div class="row between" style="margin-bottom:17px"><span class="pill ${r.status==='finalizado'?'ok':''}">${briefHistoryState(r)} · ${r.briefingAutoCreated&&!r.activityRecordOpenedAt?'Briefing Diário':r.entryMode==='registro'?'Registro rápido':'Preparação'}</span><button class="btn compact secondary" data-action="toggle-edit-record">${icon('pencil')} ${editing?'Concluir edição':'Editar'}</button></div>${editing?renderEditRecord(r):renderReadRecord(r)}<div class="actions">${r.status==='andamento'?`<button class="btn" data-action="resume-record">${r.briefingAutoCreated&&!r.activityRecordOpenedAt?'Registrar execução':'Continuar registro'}</button><button class="btn secondary" data-action="finish-record">Finalizar sem feedback</button>`:`<button class="btn secondary" data-action="reopen-record">Reabrir registro</button>`}</div><div class="danger-zone"><button type="button" class="btn danger" data-action="delete-record">${icon('trash')} Excluir registro</button></div>`;}
+function renderReadRecord(r){return `<div class="card soft"><div class="info-row"><span class="key">Data</span><span class="value">${esc(shortDate(r.date))}</span></div><div class="info-row"><span class="key">Hora</span><span class="value">${esc(r.time||'Não informado')}</span></div>${r.briefingAutoCreated&&!r.activityRecordOpenedAt?'<p class="help">Registro gerado automaticamente ao salvar o Briefing. Nenhuma estratégia ou atividade foi marcada como executada.</p>':''}<div class="info-row"><span class="key">Iniciou a atividade?</span><span class="value">${r.result==='sim'?'Sim':r.result==='nao'?'Não':'Não informado'}</span></div>${r.durationMinutes!=null?`<div class="info-row"><span class="key">Duração</span><span class="value">${formatMinutes(r.durationMinutes)}</span></div>`:''}<hr class="line"><div class="field"><span class="form-label">${r.briefingAutoCreated&&!r.activityRecordOpenedAt?'Moods previstos':'Mood na preparação'}</span>${moodsMarkup(r.initialMoods,r.activityId)}</div><div class="field"><span class="form-label">Mood durante</span>${moodsMarkup(r.duringMoods,r.activityId)}</div><div class="field"><span class="form-label">Mood ao finalizar</span>${moodsMarkup(r.finalMoods,r.activityId)}</div><div class="field" style="margin-bottom:0"><span class="form-label">Estratégias</span>${showStrategyStatuses(r,false)}</div>${r.notes?`<hr class="line"><div class="form-label">Observações</div><div class="text-sm">${esc(r.notes).replace(/\n/g,'<br>')}</div>`:''}</div>`;}
 function renderEditRecord(r){return `<div class="field"><label class="form-label" for="activity-field">Atividade</label><select data-field="activityId" id="activity-field">${ACTIVITIES.map(a=>`<option value="${a.id}" ${a.id===r.activityId?'selected':''}>${esc(a.name)}</option>`).join('')}</select></div><div class="split"><div class="field"><label class="form-label" for="date-field">Data</label><input id="date-field" data-field="date" type="date" value="${esc(r.date)}"></div><div class="field"><label class="form-label" for="time-field">Hora</label><input id="time-field" data-field="time" type="time" value="${esc(r.time||'')}"></div></div><div class="field"><label class="form-label">Mood na preparação</label>${moodSelectMini(r.activityId,r.initialMoods,'edit-initial')}</div><div class="field"><label class="form-label">Mood durante a atividade</label>${moodSelectMini(r.activityId,r.duringMoods,'during')}</div><div class="field"><label class="form-label">Mood ao finalizar</label>${moodSelectMini(r.activityId,r.finalMoods,'final')}</div><div class="field"><label class="form-label">Iniciou a atividade?</label><div class="split"><button class="choice-btn ${r.result==='sim'?'selected':''}" data-action="result" data-value="sim">Sim</button><button class="choice-btn ${r.result==='nao'?'selected':''}" data-action="result" data-value="nao">Não</button></div></div><div class="field"><label class="form-label">Duração</label>${durationMarkup(r)}</div><div class="field"><label class="form-label">Estratégias do registro</label>${showStrategyStatuses(r,true)}${ui.editStrategyId?`<form class="form-card mt-sm" data-form="edit-historical-strategy" data-id="${esc(ui.editStrategyId)}"><label class="form-label">Editar estratégia neste registro<textarea name="text" maxlength="500" rows="2" required>${esc(r.strategies.find(s=>s.id===ui.editStrategyId)?.text||'')}</textarea></label><div class="split"><button type="submit" class="btn">Salvar texto</button><button type="button" class="btn secondary" data-action="cancel-historical-edit">Cancelar</button></div></form>`:''}<button class="btn secondary mt-sm" data-action="toggle-add-historical">${icon('plus')} Acrescentar estratégia</button>${ui.addingStrategy?`<form class="form-card mt-sm" data-form="historical-strategy"><label class="form-label">Texto<textarea name="text" rows="2" maxlength="500" required></textarea></label><button type="submit" class="btn">Adicionar ao registro</button></form>`:''}</div><div class="field"><label class="form-label" for="edit-notes">Observações</label><textarea id="edit-notes" data-field="notes" maxlength="3000" rows="3">${esc(r.notes||'')}</textarea></div>`;}
 // V13 — Briefing Diário. Independent daily planning; historical records remain immutable snapshots.
 const BRIEF_IDS=['work','train','food','sleep'];
@@ -298,33 +303,146 @@ ui.briefOpen='all';
 ui.briefTab='plan';
 ui.briefTabs={};
 ui.briefShowAll={};
+ui.briefEditing=false;
+ui.briefDraft=null;
+ui.briefDirty=false;
+ui.briefLastOpen={};
+ui.briefReturnRecordId=null;
+function briefClone(value){return JSON.parse(JSON.stringify(value));}
+function briefEmpty(date){return {id:uid(),date,activities:{},closedAt:null,createdAt:new Date().toISOString()};}
+function briefOpenDate(date){
+ const saved=briefFor(date,false);
+ ui.briefDate=date;
+ ui.briefEditing=!saved?.savedAt;
+ ui.briefDraft=ui.briefEditing?briefClone(saved||briefEmpty(date)):null;
+ ui.briefDirty=false;ui.briefLastOpen={};ui.briefTabs={};ui.briefOpen='all';ui.briefShowAll={};
+}
+function briefEnterEdit(){
+ const saved=briefFor(ui.briefDate,false);
+ ui.briefDraft=briefClone(saved||briefEmpty(ui.briefDate));
+ ui.briefEditing=true;ui.briefDirty=false;ui.briefOpen='all';render();
+}
+function briefDiscard(){
+ if(ui.briefDirty&&!window.confirm('Descartar as alterações ainda não salvas do Briefing?'))return false;
+ const saved=briefFor(ui.briefDate,false);
+ ui.briefDraft=null;ui.briefDirty=false;ui.briefEditing=false;
+ if(!saved?.savedAt){view('home');}else{render();}
+ return true;
+}
+function briefPushSnapshot(){
+ // Reminders use recorded execution status, but NEVER modify the saved plan.
+ return (db.briefings||[]).map(b=>({ ...b,activities:Object.fromEntries(Object.entries(b.activities||{}).map(([aid,sec])=>{
+  const linked=sec.recordId&&db.records.find(r=>r.id===sec.recordId);
+  return [aid,{...sec,strategies:(sec.strategies||[]).map(st=>({...st,done:!!st.done||!!linked?.strategies?.some(done=>done.done&&(done.sourceId===st.sourceId||done.id===st.id))}))}];
+ }))}));
+}
+// V15: salvar um plano gera um registro histórico de PLANEJAMENTO por atividade selecionada.
+// Planejar não implica que a estratégia foi executada nem que a atividade foi realizada.
+function briefHistoryState(r){
+ if(r.briefingAutoCreated && r.briefingCancelledAt && !r.activityRecordOpenedAt && !r.result)return 'Plano retirado';
+ if(r.briefingAutoCreated && !r.activityRecordOpenedAt && !r.result && r.status!=='finalizado' && !(r.strategies||[]).some(s=>s.done))return 'Planejado';
+ return r.status==='finalizado'?'Finalizado':'Em andamento';
+}
+function briefSelectedMoods(aid,sec){return (sec.moodIds||[]).map(id=>({id,name:activityMoods(aid,false).find(m=>m.id===id)?.name||id}));}
+function briefSelectedStrategies(sec){return (sec.strategies||[]).map(st=>({
+ id:st.id,sourceId:st.sourceId,text:st.text,kind:'acao',timing:st.timing||'agora',done:false,helped:null,fromBriefing:true
+}));}
+function briefReconcileHistory(plan){
+ if(!plan?.savedAt)return false;
+ let changed=false;
+ for(const aid of BRIEF_IDS){
+  const sec=plan.activities?.[aid];if(!sec)continue;
+  const moods=sec.moodIds||[],selected=sec.strategies||[];
+  let linked=sec.recordId&&db.records.find(r=>r.id===sec.recordId&&r.activityId===aid);
+  if(!linked){linked=db.records.find(r=>r.briefingAutoCreated&&r.briefingOrigin===plan.date&&r.activityId===aid);
+   if(linked){sec.recordId=linked.id;changed=true;}
+  }
+  if(!selected.length&&!moods.length){
+   // Manter registro de planejamento previamente salvo, sem insinuar execução.
+   if(linked?.briefingAutoCreated&&!linked.activityRecordOpenedAt&&linked.status!=='finalizado'&&!linked.result&&!(linked.strategies||[]).some(st=>st.done)){
+    if(!linked.briefingCancelledAt||linked.strategies.length||linked.initialMoods.length){
+     linked.briefingCancelledAt=new Date().toISOString();linked.strategies=[];linked.initialMoods=[];
+     linked.updatedAt=linked.briefingCancelledAt;changed=true;
+    }
+   }
+   continue;
+  }
+  if(!linked){
+   const t=plan.savedAt;
+   linked={id:uid(),activityId:aid,date:plan.date,time:'',entryMode:'registro',
+    createdAt:t,updatedAt:t,status:'andamento',initialMoods:briefSelectedMoods(aid,sec),
+    duringMoods:[],finalMoods:[],excludedStrategyIds:[],preventionSelectedIds:[],temporaryStrategies:[],
+    strategies:briefSelectedStrategies(sec),preparationSaved:true,result:null,durationMinutes:null,notes:'',
+    briefingOrigin:plan.date,briefingAutoCreated:true,briefingSavedAt:t,activityRecordOpenedAt:null};
+   db.records.push(linked);sec.recordId=linked.id;changed=true;continue;
+  }
+  if(linked.status==='finalizado')continue; // Resultado já registrado não deve ser reescrito por edições do plano.
+  if(linked.briefingCancelledAt){linked.briefingCancelledAt=null;changed=true;}
+  if(!linked.activityRecordOpenedAt && linked.briefingAutoCreated){
+   const next=briefSelectedMoods(aid,sec);
+   if(JSON.stringify(next)!==JSON.stringify(linked.initialMoods)){linked.initialMoods=next;changed=true;}
+  }
+  const old=linked.strategies||[];const merged=[];
+  for(const item of old){
+   const planned=selected.find(st=>st.sourceId===item.sourceId||st.id===item.id);
+   // Preserva estratégias executadas e inclusões manuais no registro, mesmo após editar o Briefing.
+   if(item.done||planned||!item.fromBriefing)merged.push(item);
+  }
+  for(const st of selected){if(!merged.some(item=>item.sourceId===st.sourceId||item.id===st.id)){
+   merged.push({id:st.id,sourceId:st.sourceId,text:st.text,kind:'acao',timing:st.timing||'agora',done:false,helped:null,fromBriefing:true});
+  }}
+  if(JSON.stringify(merged)!==JSON.stringify(old)){linked.strategies=merged;changed=true;}
+  if(changed)linked.updatedAt=new Date().toISOString();
+ }
+ return changed;
+}
+function briefBackfillSavedPlans(){
+ let changed=false;
+ for(const b of db.briefings||[])if(b.savedAt)changed=briefReconcileHistory(b)||changed;
+ return changed;
+}
+function briefCommit(){
+ if(!ui.briefEditing||!ui.briefDraft)return;
+ const plan=briefClone(ui.briefDraft);
+ plan.savedAt=new Date().toISOString();plan.updatedAt=plan.savedAt;
+ const ix=db.briefings.findIndex(x=>x.date===plan.date),old=ix>=0?db.briefings[ix]:null;
+ const recordsBefore=briefClone(db.records);
+ if(ix>=0)db.briefings[ix]=plan;else db.briefings.push(plan);
+ briefReconcileHistory(plan); // Cada atividade planejada tem um registro de planejamento no Histórico.
+ if(!persist()){db.records=recordsBefore;if(ix>=0)db.briefings[ix]=old;else db.briefings.pop();return;}
+ ui.briefDraft=null;ui.briefEditing=false;ui.briefDirty=false;ui.briefOpen='all';
+ window.RituaisPush?.queueSync?.(briefPushSnapshot());
+ render();toast('Briefing salvo e registrado no Histórico como planejamento.');
+}
+
 function briefFor(date=ui.briefDate,create=true){
  let b=db.briefings.find(x=>x.date===date);
  if(!b&&create){b={id:uid(),date,activities:{},closedAt:null,createdAt:new Date().toISOString()};db.briefings.push(b);persist();}
  return b||null;
 }
 function briefSection(aid,create=true){
- const b=briefFor(ui.briefDate,create);if(!b)return null;
+ const b=ui.briefEditing&&ui.briefDraft?.date===ui.briefDate?ui.briefDraft:briefFor(ui.briefDate,create);if(!b)return null;
  if(!b.activities||typeof b.activities!=='object')b.activities={};
  if(!b.activities[aid]&&create)b.activities[aid]={moodIds:[],strategies:[],result:null,recordId:null};
  return b.activities[aid]||null;
 }
 function briefLatestRecord(aid){
- return db.records.filter(r=>r.activityId===aid&&!(r.entryMode==='briefing'&&r.result==null&&r.status!=='finalizado'))
+ return db.records.filter(r=>r.activityId===aid&&!(r.briefingAutoCreated&&!r.result&&r.status!=='finalizado'&&!(r.strategies||[]).some(s=>s.done))&&!(r.entryMode==='briefing'&&r.result==null&&r.status!=='finalizado'))
   .sort((a,b)=>`${b.date||''}T${b.time||''}:${b.updatedAt||''}`.localeCompare(`${a.date||''}T${a.time||''}:${a.updatedAt||''}`))[0]||null;
 }
 function briefStatus(aid){
  const sec=briefSection(aid,false),r=sec?.recordId?db.records.find(x=>x.id===sec.recordId):null;
  const dayEntries=db.records.filter(x=>x.date===ui.briefDate&&x.activityId===aid&&x.result).sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));
- const result=sec?.result||r?.result||dayEntries[0]?.result;
+ const result=r?.result||dayEntries[0]?.result||sec?.result;
  if(result==='sim')return 'yes';if(result==='nao')return 'no';
  if(sec&&(sec.strategies.length||sec.moodIds.length))return 'prepared';
  return 'unplanned';
 }
 function briefSave(){
- const b=briefFor();if(b)b.updatedAt=new Date().toISOString();
- persist();
- window.RituaisPush?.queueSync?.(db.briefings);
+ // A seleção em edição é um rascunho; só o botão Salvar publica o plano e os lembretes.
+ if(ui.briefEditing&&ui.briefDraft){ui.briefDirty=true;return;}
+ const b=briefFor(ui.briefDate,false);if(b)b.updatedAt=new Date().toISOString();
+ if(persist())window.RituaisPush?.queueSync?.(briefPushSnapshot());
 }
 function briefMoodToggle(aid,id){
  const s=briefSection(aid),list=new Set(s.moodIds||[]);
@@ -350,28 +468,48 @@ function briefStrategyToggle(aid,sid){
  }
  briefSave();render();
 }
-function briefEnsureRecord(aid){
- const sec=briefSection(aid);let r=sec.recordId&&db.records.find(x=>x.id===sec.recordId);
- if(!r){
-  const t=nowLocal();r={id:uid(),activityId:aid,date:ui.briefDate,time:t.time,entryMode:'briefing',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),status:'andamento',initialMoods:[],duringMoods:[],finalMoods:[],excludedStrategyIds:[],preventionSelectedIds:[],temporaryStrategies:[],strategies:[],preparationSaved:true,result:null,durationMinutes:null,notes:''};
-  db.records.push(r);sec.recordId=r.id;
- }
- return r;
+function briefStartRecord(aid){
+ const plan=briefFor(ui.briefDate,false);
+ if(!plan?.savedAt){toast('Salve o Briefing antes de registrar a atividade.');return;}
+ let section=plan.activities?.[aid];
+ if(!section){section={moodIds:[],strategies:[],result:null,recordId:null};plan.activities[aid]=section;}
+ const existing=section.recordId&&db.records.find(r=>r.id===section.recordId&&r.activityId===aid);
+ if(existing){
+  // An unfinished record may receive newly planned strategies; completed history is immutable.
+  if(existing.status!=='finalizado'&&existing.entryMode==='registro'&&existing.briefingOrigin){
+   const selected=section.strategies||[];
+   const old=existing.strategies||[];
+   const stillRelevant=old.filter(s=>s.done||selected.some(x=>x.sourceId===s.sourceId||x.id===s.id));
+   for(const st of selected){if(!stillRelevant.some(x=>x.sourceId===st.sourceId||x.id===st.id)){
+    stillRelevant.push({id:st.id,sourceId:st.sourceId,text:st.text,kind:'acao',timing:st.timing||'agora',done:false,helped:null});
+   }}
+   const changed=JSON.stringify(old)!==JSON.stringify(stillRelevant);
+   if(changed){existing.strategies=stillRelevant;touch(existing);}
+  }
+  if(existing.briefingAutoCreated&&!existing.activityRecordOpenedAt&&existing.status!=='finalizado'){
+   existing.activityRecordOpenedAt=new Date().toISOString();
+   if(!existing.time&&existing.date===nowLocal().date)existing.time=nowLocal().time;
+   touch(existing);
+  }
+  ui.briefReturnRecordId=existing.id;ui.recordId=existing.id;
+  ui.quickTiming='agora';ui.quickExpanded=true;ui.quickDetails=false;
+  view(existing.status==='finalizado'?'record':existing.entryMode==='registro'?'quick':'record');return;}
+ const time=ui.briefDate===nowLocal().date?null:'';
+ newRecord(aid,ui.briefDate,time,'registro');
+ rec().activityRecordOpenedAt=new Date().toISOString();
+ section.recordId=rec().id;
+ ui.briefReturnRecordId=rec().id;ui.quickExpanded=true;
+ persist();
+ toast('Registro iniciado. Marque as estratégias executadas e salve no Histórico.');
 }
-function briefSyncRecord(aid){
- const sec=briefSection(aid);if(!sec.strategies.some(s=>s.done)&&!sec.result&&!sec.recordId)return;
- const r=briefEnsureRecord(aid);
- r.initialMoods=(sec.moodIds||[]).map(id=>{const m=activityMoods(aid,false).find(x=>x.id===id);return {id,name:m?.name||id};});
- // Preserve ratings and any extra strategies added from the regular recording flow.
- const old=r.strategies||[];
- r.strategies=sec.strategies.map(s=>{const o=old.find(x=>x.id===s.id||x.sourceId===s.sourceId);return {id:s.id,sourceId:s.sourceId,text:s.text,kind:'acao',timing:s.timing||'agora',done:!!s.done,helped:o?.helped??null};})
-  .concat(old.filter(o=>!sec.strategies.some(s=>s.sourceId===o.sourceId||s.id===o.id)));
- r.result=sec.result||null;r.updatedAt=new Date().toISOString();
- if(sec.result)r.status='finalizado';
+function briefCardHeader(a){
+ const status=briefStatus(a.id),sec=briefSection(a.id,false),total=sec?.strategies.length||0;
+ const editing=ui.briefEditing;
+ const action=editing?'brief-open':'brief-register';
+ const linked=sec?.recordId&&db.records.find(r=>r.id===sec.recordId);
+ const note=editing?'Selecionar estratégias':linked?(linked.status==='finalizado'?'Ver registro':briefHistoryState(linked)==='Planejado'?'Registrar execução':'Continuar registro'):'Registrar atividade';
+ return `<button class="brief-card-heading" data-action="${action}" data-id="${a.id}" aria-expanded="${editing&&(ui.briefOpen==='all'||ui.briefOpen===a.id)}"><span class="brief-icon">${icon(a.icon)}</span><span class="brief-head-text"><strong>${esc(a.name)}</strong><small>${BRIEF_LABEL[status]} · ${total} estratégia(s) · ${note}</small></span><span class="brief-status ${status}">${icon(status==='yes'?'check':status==='no'?'x':'circle')}</span>${icon(editing&&ui.briefOpen===a.id?'up':editing?'down':'right')}</button>`;
 }
-function briefMarkDone(aid,sid){const sec=briefSection(aid);const st=sec.strategies.find(x=>x.id===sid);if(!st)return;st.done=!st.done;st.checkedAt=st.done?new Date().toISOString():null;briefSyncRecord(aid);briefSave();render();}
-function briefSetResult(aid,value){const sec=briefSection(aid);sec.result=sec.result===value?null:value;briefSyncRecord(aid);briefSave();render();}
-function briefCardHeader(a){const status=briefStatus(a.id);const sec=briefSection(a.id,false),num=sec?.strategies.filter(x=>x.done).length||0,total=sec?.strategies.length||0;return `<button class="brief-card-heading" data-action="brief-open" data-id="${a.id}" aria-expanded="${ui.briefOpen==='all'||ui.briefOpen===a.id}"><span class="brief-icon">${icon(a.icon)}</span><span class="brief-head-text"><strong>${esc(a.name)}</strong><small>${BRIEF_LABEL[status]}${total?` · ${num}/${total} rituais`:''}</small></span><span class="brief-status ${status}">${icon(status==='yes'?'check':status==='no'?'x':'circle')}</span>${icon(ui.briefOpen===a.id?'up':'down')}</button>`;}
 function briefMoodPicker(aid){const s=briefSection(aid);return `<div class="brief-label">Moods (opcionais)</div><div class="brief-mood-list">${activityMoods(aid).map(m=>`<button data-action="brief-mood" data-id="${esc(aid)}" data-mood="${esc(m.id)}" class="brief-mood ${s.moodIds.includes(m.id)?'selected':''}" aria-pressed="${s.moodIds.includes(m.id)}">${esc(m.name)}</button>`).join('')}</div>`;}
 function briefStats(sourceId,text){
  const matches=db.records.flatMap(r=>r.strategies||[]).filter(s=>s.done&&(s.sourceId===sourceId||nameKey(s.text)===nameKey(text)));
@@ -380,7 +518,7 @@ function briefStats(sourceId,text){
 }
 function briefStrategyItem(aid,st,selected){
  const isChecked=!!selected;const status=selected?.done||false;
- return `<div class="brief-strategy ${isChecked?'chosen':''} ${ui.briefTarget===selected?.id?'brief-target':''}" data-brief-strategy-id="${esc(selected?.id||st.id)}"><label class="brief-strategy-check"><input type="checkbox" data-brief-check="strategy" data-aid="${esc(aid)}" data-id="${esc(st.id)}" ${isChecked?'checked':''}><span><strong>${esc(st.label||'Ritual')}</strong><span class="brief-action-text">${esc(st.text)}</span>${st.confront?`<small class="brief-confront">${esc(st.confront)}</small>`:''}${briefStats(st.id,st.text)}</span></label>${isChecked?`<div class="brief-plan-controls"><label class="brief-done"><input type="checkbox" data-brief-check="done" data-aid="${esc(aid)}" data-id="${esc(selected.id)}" ${status?'checked':''}> Executada</label><label class="brief-time-label">Horário <input type="time" value="${esc(selected.time||'')}" data-brief-input="time" data-aid="${esc(aid)}" data-id="${esc(selected.id)}" aria-label="Horário opcional"></label><label class="brief-notify"><input type="checkbox" data-brief-check="notify" data-aid="${esc(aid)}" data-id="${esc(selected.id)}" ${selected.notify?'checked':''} ${selected.time?'':'disabled'}> Avisar</label>${selected.time?`<button class="brief-delay" data-action="brief-delay" data-aid="${esc(aid)}" data-id="${esc(selected.id)}">Adiar 15 min</button>`:''}</div>`:''}</div>`;
+ return `<div class="brief-strategy ${isChecked?'chosen':''} ${ui.briefTarget===selected?.id?'brief-target':''}" data-brief-strategy-id="${esc(selected?.id||st.id)}"><label class="brief-strategy-check"><input type="checkbox" data-brief-check="strategy" data-aid="${esc(aid)}" data-id="${esc(st.id)}" ${isChecked?'checked':''}><span><strong>${esc(st.label||'Ritual')}</strong><span class="brief-action-text">${esc(st.text)}</span>${st.confront?`<small class="brief-confront">${esc(st.confront)}</small>`:''}${briefStats(st.id,st.text)}</span></label>${isChecked?`<div class="brief-plan-controls"><label class="brief-time-label">Horário <input type="time" value="${esc(selected.time||'')}" data-brief-input="time" data-aid="${esc(aid)}" data-id="${esc(selected.id)}" aria-label="Horário opcional"></label><label class="brief-notify"><input type="checkbox" data-brief-check="notify" data-aid="${esc(aid)}" data-id="${esc(selected.id)}" ${selected.notify?'checked':''} ${selected.time?'':'disabled'}> Avisar</label></div>`:''}</div>`;
 }
 function briefPlanBody(aid){
  const sec=briefSection(aid);const catalog=briefAvailable(aid);
@@ -392,22 +530,43 @@ function briefPlanBody(aid){
  <div class="brief-strategy-list">${[...limited,...extras].map(st=>briefStrategyItem(aid,st,briefSelected(aid,st.id))).join('')||'<p class="subtle">Nenhuma estratégia para os moods selecionados.</p>'}</div>
  ${match.length>7?`<button class="muted-link" data-action="brief-all" data-id="${aid}">${ui.briefShowAll[aid]?'Mostrar menos':`Ver todas (${match.length})`}</button>`:''}
  <button class="btn secondary brief-reveal" data-action="brief-show-all" data-id="${aid}">${icon('plus')} Explorar toda a biblioteca</button>
- <div class="brief-label">Resultado da atividade <small>(opcional)</small></div><div class="brief-result-row"><button data-action="brief-result" data-id="${aid}" data-value="sim" class="choice-btn ${sec.result==='sim'?'selected':''}">Realizada</button><button data-action="brief-result" data-id="${aid}" data-value="nao" class="choice-btn ${sec.result==='nao'?'selected':''}">Não realizada</button></div>
+ <p class="help">Ao salvar, esta atividade terá um registro Planejado no Histórico. Marque a execução depois, abrindo a atividade.</p>
  ${aid==='sleep'?briefLastSleep():''}`;
 }
-function briefLastSleep(){const b=briefFor(),sleep=b.lastSleep||{};return `<div class="brief-sleep-input"><strong>Última noite</strong><span class="help">Preenchimento opcional, não inferido a partir da higiene do sono.</span><div class="brief-last-sleep-row"><label>Horas dormidas <input type="number" min="0" max="24" step="0.5" placeholder="Ex.: 7,5" data-brief-sleep="hours" value="${esc(sleep.hours??'')}"></label><label>Qualidade percebida <select data-brief-sleep="quality"><option value="">Não informada</option>${[1,2,3,4,5].map(x=>`<option value="${x}" ${sleep.quality==x?'selected':''}>${x}/5</option>`).join('')}</select></label></div></div>`;}
+function briefLastSleep(){const b=ui.briefEditing?ui.briefDraft:briefFor(),sleep=b.lastSleep||{};return `<div class="brief-sleep-input"><strong>Última noite</strong><span class="help">Preenchimento opcional, não inferido a partir da higiene do sono.</span><div class="brief-last-sleep-row"><label>Horas dormidas <input type="number" min="0" max="24" step="0.5" placeholder="Ex.: 7,5" data-brief-sleep="hours" value="${esc(sleep.hours??'')}"></label><label>Qualidade percebida <select data-brief-sleep="quality"><option value="">Não informada</option>${[1,2,3,4,5].map(x=>`<option value="${x}" ${sleep.quality==x?'selected':''}>${x}/5</option>`).join('')}</select></label></div></div>`;}
 function briefLastView(aid){const r=briefLatestRecord(aid);if(!r)return `<p class="empty">Nenhum registro anterior desta atividade.</p>`;
  const rows=(r.strategies||[]).map(s=>`<div class="brief-last-item"><span class="brief-last-symbol">${icon(s.done?'check':'circle')}</span><span>${esc(s.text)}</span><small>${s.done?'Executada':'Não executada'}${s.done&&s.helped!==null&&s.helped!==undefined?' · '+(s.helped===true?'Ajudou':s.helped===false?'Não ajudou':'Não sei'):''}</small></div>`).join('');
  return `<div class="brief-last"><p class="subtle">${esc(shortDate(r.date))} · ${esc(r.time||'Horário não informado')}</p><div class="brief-last-pills">${moodsMarkup(r.initialMoods,aid)}</div><p class="text-sm"><strong>Atividade:</strong> ${r.result==='sim'?'Realizada':r.result==='nao'?'Não realizada':'Resultado não informado'}</p>${rows||'<p class="subtle">Sem estratégias registradas.</p>'}<button class="btn secondary" data-action="brief-reuse" data-id="${aid}" data-record="${esc(r.id)}">Reutilizar estratégias</button></div>`;
 }
-function renderBriefing(){const b=briefFor();const complete=b.closedAt!==null;return `<header class="topbar"><button class="icon-button" data-action="brief-back" aria-label="Voltar">${icon('back')}</button><span class="activity-name">BRIEFING DIÁRIO</span>${icon('archive','activity-icon')}</header>
+function briefOverviewCard(a){
+ const sec=briefSection(a.id,false);const selected=sec?.strategies||[];
+ const moods=(sec?.moodIds||[]).map(id=>activityMoods(a.id,false).find(m=>m.id===id)?.name||id);
+ const r=sec?.recordId&&db.records.find(x=>x.id===sec.recordId);
+ return `<section class="brief-card" data-activity="${a.id}">
+ ${briefCardHeader(a)}
+ <div class="brief-card-content brief-read-content">
+ ${moods.length?`<p class="brief-mood-summary"><strong>Moods planejados:</strong> ${esc(moods.join(' · '))}</p>`:''}
+ ${selected.length?`<div class="brief-picked-list">${selected.map(st=>`<div class="brief-picked-item ${ui.briefTarget===st.id?'brief-target':''}" data-brief-strategy-id="${esc(st.id)}"><span class="brief-picked-dot">${icon('circle')}</span><div><strong>${esc(st.label||'Estratégia')}</strong><p>${esc(st.text)}</p>${st.time?`<small>${icon('clock')} ${esc(st.time)}${st.notify?' · Lembrete ativado':''}</small>`:''}</div></div>`).join('')}</div>`:'<p class="subtle text-sm">Nenhuma estratégia escolhida nesta atividade.</p>'}
+ <div class="brief-card-actions"><button class="btn brief-record-btn" data-action="brief-register" data-id="${a.id}">${icon(r?.status==='finalizado'?'history':'check')} ${r?(r.status==='finalizado'?'Ver registro no Histórico':briefHistoryState(r)==='Planejado'?'Registrar execução':'Continuar registro'):'Registrar atividade'}</button>
+ <button class="btn secondary" data-action="brief-last-toggle" data-id="${a.id}">${icon('history')} ${ui.briefLastOpen[a.id]?'Ocultar':'Último registro'}</button></div>
+ ${ui.briefLastOpen[a.id]?briefLastView(a.id):''}
+ </div></section>`;
+}
+function renderBriefing(){
+ const editing=ui.briefEditing;
+ const b=editing?ui.briefDraft:briefFor(ui.briefDate,false);
+ const complete=!!b?.closedAt;
+ return `<header class="topbar"><button class="icon-button" data-action="brief-back" aria-label="Voltar">${icon('back')}</button><span class="activity-name">BRIEFING DIÁRIO</span>${icon('archive','activity-icon')}</header>
  <div class="brief-intro"><p>Plano de operações</p><h2>${esc(shortDate(ui.briefDate))}</h2><label class="brief-date">Data <input type="date" id="brief-date-picker" value="${esc(ui.briefDate)}"></label></div>
- <div class="brief-status-grid">${ACTIVITIES.map(a=>`<button class="brief-status-mini ${briefStatus(a.id)}" data-action="brief-open" data-id="${a.id}"><strong>${esc(a.name)}</strong><small>${BRIEF_LABEL[briefStatus(a.id)]}</small></button>`).join('')}</div>
- <div class="brief-cards">${ACTIVITIES.map(a=>`<section class="brief-card" data-activity="${a.id}">${briefCardHeader(a)}${(ui.briefOpen==='all'||ui.briefOpen===a.id)?`<div class="brief-card-content"><div class="brief-tabs"><button class="${(ui.briefTabs?.[a.id]||'plan')==='plan'?'active':''}" data-action="brief-tab" data-id="${a.id}" data-value="plan">Plano de hoje</button><button class="${(ui.briefTabs?.[a.id]||'plan')==='last'?'active':''}" data-action="brief-tab" data-id="${a.id}" data-value="last">Último registro</button></div>${(ui.briefTabs?.[a.id]||'plan')==='plan'?briefPlanBody(a.id):briefLastView(a.id)}</div>`:''}</section>`).join('')}</div>
- <div class="brief-footer"><button class="btn secondary" data-action="brief-push">${icon('clock')} ${window.RituaisPush?.enabled?.()?'Desativar notificações':'Ativar notificações'}</button><p class="subtle small">Horários são opcionais. O envio em segundo plano exige configurar o servidor e permitir notificações no iPhone.</p>
- <button class="btn ${complete?'secondary':''}" data-action="brief-close">${icon(complete?'pencil':'check')} ${complete?'Reabrir missão':'Encerrar missão'}</button>${complete?`<p class="help">Missão encerrada ${esc(new Date(b.closedAt).toLocaleString('pt-BR'))}. Confira o resumo abaixo.</p>`:''}
- <div class="brief-summary">${ACTIVITIES.map(a=>{const s=briefSection(a.id,false);return `<div class="info-row"><span>${esc(a.name)}</span><strong>${BRIEF_LABEL[briefStatus(a.id)]} · ${s?.strategies.filter(x=>x.done).length||0}/${s?.strategies.length||0}</strong></div>`}).join('')}</div></div>`;}
+ ${editing?`<div class="brief-mode-notice"><strong>Edição do plano</strong><span>Selecione moods e estratégias. Ao salvar, cada atividade planejada ganha um registro no Histórico com status Planejado; execução e resultado continuam pendentes.</span></div><div class="brief-edit-actions"><button class="btn" data-action="brief-save">${icon('check')} Salvar Briefing</button><button class="btn secondary" data-action="brief-cancel">Cancelar edição</button></div>`:
+ `<div class="brief-mode-notice saved"><strong>Plano salvo ${b?.savedAt?`· ${esc(new Date(b.savedAt).toLocaleString('pt-BR',{hour:'2-digit',minute:'2-digit'}))}`:''}</strong><span>Somente estratégias selecionadas. O planejamento já está no Histórico; toque na atividade para registrar a execução.</span></div><button class="btn secondary brief-edit-top" data-action="brief-edit">${icon('pencil')} Editar Briefing</button>`}
+ <div class="brief-status-grid">${ACTIVITIES.map(a=>`<button class="brief-status-mini ${briefStatus(a.id)}" data-action="${editing?'brief-open':'brief-register'}" data-id="${a.id}"><strong>${esc(a.name)}</strong><small>${BRIEF_LABEL[briefStatus(a.id)]}</small></button>`).join('')}</div>
+ <div class="brief-cards">${editing?ACTIVITIES.map(a=>`<section class="brief-card" data-activity="${a.id}">${briefCardHeader(a)}${(ui.briefOpen==='all'||ui.briefOpen===a.id)?`<div class="brief-card-content"><div class="brief-tabs"><button class="${(ui.briefTabs?.[a.id]||'plan')==='plan'?'active':''}" data-action="brief-tab" data-id="${a.id}" data-value="plan">Plano de hoje</button><button class="${(ui.briefTabs?.[a.id]||'plan')==='last'?'active':''}" data-action="brief-tab" data-id="${a.id}" data-value="last">Último registro</button></div>${(ui.briefTabs?.[a.id]||'plan')==='plan'?briefPlanBody(a.id):briefLastView(a.id)}</div>`:''}</section>`).join(''):ACTIVITIES.map(briefOverviewCard).join('')}</div>
+ ${editing?`<div class="brief-footer"><button class="btn" data-action="brief-save">${icon('check')} Salvar e visualizar plano</button><p class="help">Somente as estratégias selecionadas aparecerão no plano salvo. É possível editar novamente a qualquer momento.</p></div>`:
+ `<div class="brief-footer"><button class="btn secondary" data-action="brief-push">${icon('clock')} ${window.RituaisPush?.enabled?.()?'Desativar notificações':'Ativar notificações'}</button><p class="subtle small">Lembretes programados apenas para estratégias salvas com horário e aviso ativado. Recebimento em segundo plano exige configuração do servidor.</p><button class="btn ${complete?'secondary':''}" data-action="brief-close">${icon(complete?'pencil':'check')} ${complete?'Reabrir missão':'Encerrar missão'}</button>${complete?`<p class="help">Missão encerrada ${esc(new Date(b.closedAt).toLocaleString('pt-BR'))}.</p>`:''}<div class="brief-summary">${ACTIVITIES.map(a=>{const s=briefSection(a.id,false);const r=s?.recordId&&db.records.find(x=>x.id===s.recordId);return `<div class="info-row"><span>${esc(a.name)}</span><strong>${BRIEF_LABEL[briefStatus(a.id)]} · ${r?.strategies?.filter(x=>x.done).length||0}/${s?.strategies?.length||0} execuções</strong></div>`}).join('')}</div></div>`}`;
+}
 function briefReuse(aid,rid){const r=db.records.find(x=>x.id===rid&&x.activityId===aid);if(!r)return;
+ if(!ui.briefEditing){ui.briefDraft=briefClone(briefFor(ui.briefDate,false)||briefEmpty(ui.briefDate));ui.briefEditing=true;ui.briefOpen=aid;ui.briefDirty=false;}
  const sec=briefSection(aid),seen=new Set(sec.strategies.map(x=>nameKey(x.text))),all=briefAvailable(aid);
  for(const old of r.strategies||[]){const key=nameKey(old.text);if(seen.has(key))continue;seen.add(key);const match=all.find(x=>nameKey(x.text)===key);
  sec.strategies.push({id:uid(),sourceId:match?.id||old.sourceId||uid(),text:old.text,label:match?.label||'',confront:match?.confront||'',timing:match?.timing||old.timing||'agora',done:false,time:'',notify:false});}
@@ -415,7 +574,7 @@ function briefReuse(aid,rid){const r=db.records.find(x=>x.id===rid&&x.activityId
 }
 function briefFromExisting(aid,entry){const plan=briefFor(entry.date,false)?.activities?.[aid];if(!plan)return;
  entry.initialMoods=(plan.moodIds||[]).map(id=>({id,name:activityMoods(aid,false).find(m=>m.id===id)?.name||id}));
- entry.strategies=(plan.strategies||[]).map(s=>({id:s.id,sourceId:s.sourceId,text:s.text,kind:'acao',timing:s.timing||'agora',done:!!s.done,helped:null}));
+ entry.strategies=(plan.strategies||[]).map(s=>({id:s.id,sourceId:s.sourceId,text:s.text,kind:'acao',timing:s.timing||'agora',done:false,helped:null}));
  entry.briefingOrigin=entry.date;
  if(entry.entryMode==='preparacao'&&entry.strategies.length)entry.preparationSaved=true;
 }
@@ -441,7 +600,9 @@ function deleteCurrentRecord(){
  if(!window.confirm(`Excluir definitivamente o registro de ${a.name} de ${shortDate(r.date)}${r.time?' às '+r.time:''}? Esta ação não poderá ser desfeita.`))return;
  const previous=db.records;
  db.records=db.records.filter(x=>x.id!==r.id);
+ for(const b of db.briefings||[])for(const sec of Object.values(b.activities||{}))if(sec.recordId===r.id)sec.recordId=null;
  if(!persist()){db.records=previous;return;}
+ window.RituaisPush?.queueSync?.(briefPushSnapshot());
  ui.historyYear=Number(r.date.slice(0,4));ui.historyMonth=Number(r.date.slice(5,7))-1;ui.historyDay=Number(r.date.slice(8,10));
  ui.recordId=null;view('history');toast('Registro excluído.');
 }
@@ -480,25 +641,28 @@ async function importHistory(file){
  toast(`${pending.length} registro(s) importado(s)${duplicates?' · '+duplicates+' repetido(s) ignorado(s)':''}.`);
 }
 const clickHandlers={
- 'brief-back':()=>view('home'),
+ 'brief-back':()=>{if(!ui.briefEditing||briefDiscard())view('home');},
+ 'brief-save':()=>briefCommit(),
+ 'brief-edit':()=>briefEnterEdit(),
+ 'brief-cancel':()=>briefDiscard(),
+ 'brief-register':el=>briefStartRecord(el.dataset.id),
+ 'brief-last-toggle':el=>{ui.briefLastOpen[el.dataset.id]=!ui.briefLastOpen[el.dataset.id];render();},
  'brief-open':el=>{ui.briefOpen=ui.briefOpen===el.dataset.id?'':el.dataset.id;ui.briefTabs[el.dataset.id]='plan';render();},
  'brief-tab':el=>{ui.briefTabs[el.dataset.id]=el.dataset.value==='last'?'last':'plan';render();},
  'brief-mood':el=>briefMoodToggle(el.dataset.id,el.dataset.mood),
  'brief-all':el=>{ui.briefShowAll[el.dataset.id]=ui.briefShowAll[el.dataset.id]===true?false:true;render();},
  'brief-show-all':el=>{ui.briefShowAll[el.dataset.id]=ui.briefShowAll[el.dataset.id]==='library'?false:'library';render();},
- 'brief-result':el=>briefSetResult(el.dataset.id,el.dataset.value),
- 'brief-reuse':el=>briefReuse(el.dataset.id,el.dataset.record),
- 'brief-close':()=>{const b=briefFor();b.closedAt=b.closedAt?null:new Date().toISOString();briefSave();render();},
- 'brief-delay':el=>{const st=briefSection(el.dataset.aid).strategies.find(x=>x.id===el.dataset.id);if(!st)return;const from=new Date(ui.briefDate+'T'+(st.time||'12:00')+':00');const next=new Date(Math.max(Date.now(),from.getTime())+15*60000);if(nowLocal().date!==ui.briefDate||nowLocal().date!==next.getFullYear()+'-'+pad(next.getMonth()+1)+'-'+pad(next.getDate())){toast('Ajuste o horário manualmente para reagendar em outra data.');return;}st.time=pad(next.getHours())+':'+pad(next.getMinutes());briefSave();render();toast('Lembrete adiado em 15 minutos.');},
+  'brief-reuse':el=>briefReuse(el.dataset.id,el.dataset.record),
+ 'brief-close':()=>{const b=briefFor(ui.briefDate,false);if(!b?.savedAt)return;b.closedAt=b.closedAt?null:new Date().toISOString();briefSave();render();},
  'brief-push':()=>{
   if(!window.RituaisPush){toast('Módulo de notificações não carregado.');return;}
   if(window.RituaisPush.enabled()){
    if(!window.confirm('Desativar notificações deste dispositivo e cancelar lembretes pendentes?'))return;
    window.RituaisPush.disable().then(()=>{toast('Notificações desativadas.');render();}).catch(err=>toast('Não foi possível desativar: '+(err.message||'erro')));return;
   }
-  window.RituaisPush.enable(db.briefings).then(()=>{toast('Notificações ativadas para este dispositivo.');render();}).catch(err=>{toast('Notificações: '+(err.message||'não disponíveis'));render();});
+  window.RituaisPush.enable(briefPushSnapshot()).then(()=>{toast('Notificações ativadas para este dispositivo.');render();}).catch(err=>{toast('Notificações: '+(err.message||'não disponíveis'));render();});
  },
- 'open-briefing':()=>{ui.briefDate=nowLocal().date;ui.briefOpen='all';ui.briefTab='plan';view('briefing');},
+ 'open-briefing':()=>{briefOpenDate(nowLocal().date);view('briefing');},
  'home-mode':el=>{ui.homeMode=el.dataset.value==='preparar'?'preparar':'registrar';render();},
  'start':el=>newRecord(el.dataset.id,'',null,ui.homeMode==='registrar'?'registro':'preparacao'),
  'start-retro':el=>newRecord(el.dataset.id,ui.retroDate||nowLocal().date,'',ui.homeMode==='registrar'?'registro':'preparacao'),
@@ -508,7 +672,7 @@ const clickHandlers={
   'strategy-timing':el=>{ui.strategyTiming=el.dataset.value==='antes'?'antes':'agora';render();},
  'quick-details':()=>{ui.quickDetails=!ui.quickDetails;render();},
  'quick-rate':el=>{const r=rec();const st=r?.strategies.find(s=>s.id===el.dataset.id);if(!st||!st.done)return;const value=el.dataset.value==='yes'?true:el.dataset.value==='no'?false:'incerto';st.helped=st.helped===value?null:value;touch(r);render();},
- 'back':()=>{switch(ui.view){case 'quick':view('home');break;case 'moods':view('home');break;case 'strategies':view('moods');break;case 'execute':view('strategies');break;case 'feedback':view('execute');break;case 'retro':view('history');break;case 'briefing':view('home');break;case 'record':case 'record-edit':fromRecordToHistory();break;default:view('home');}},
+ 'back':()=>{switch(ui.view){case 'quick':if(ui.briefReturnRecordId===ui.recordId){ui.briefReturnRecordId=null;briefOpenDate(rec()?.date||nowLocal().date);view('briefing');}else view('home');break;case 'moods':view('home');break;case 'strategies':view('moods');break;case 'execute':view('strategies');break;case 'feedback':view('execute');break;case 'retro':view('history');break;case 'briefing':view('home');break;case 'record':case 'record-edit':fromRecordToHistory();break;default:view('home');}},
  'to-moods':()=>view('moods'),
  'to-strategies':()=>{ui.strategyTiming='agora';view('strategies');},
  'to-execute':()=>{const r=rec();if(r?.preparationSaved)view('execute');else {ui.strategyTiming='agora';view('strategies');}},
@@ -535,7 +699,9 @@ const clickHandlers={
  'toggle-edit-initial-mood':el=>updateMoods('initialMoods',el.dataset.id),
  'rate':el=>{const r=rec();const s=r.strategies.find(x=>x.id===el.dataset.id);if(!s)return;s.helped=el.dataset.value==='clear'?null:el.dataset.value==='unsure'?'incerto':el.dataset.value==='yes';touch(r);render();},
  'details-toggle':()=>{ui.feedbackExpanded=!ui.feedbackExpanded;render();},
- 'finish':()=>{const r=rec();if(!r)return;toggleStatus(r,'finalizado');toast('Registro finalizado.');},
+ 'finish':()=>{const r=rec();if(!r)return;
+ if(r.briefingOrigin&&ui.briefReturnRecordId===r.id){r.status='finalizado';touch(r);ui.recordId=null;ui.briefReturnRecordId=null;briefOpenDate(r.date);view('briefing');toast('Registro salvo no Histórico.');}
+ else{toggleStatus(r,'finalizado');toast('Registro finalizado.');}},
  'tab-home':()=>setTab('home'),
  'tab-history':()=>setTab('history'),
  'prev-month':()=>setMonth(-1),
@@ -545,7 +711,7 @@ const clickHandlers={
  'open-record':el=>openRecord(el.dataset.id),
  'back-record':()=>fromRecordToHistory(),
  'toggle-edit-record':()=>{ui.addingStrategy=false;view(ui.view==='record-edit'?'record':'record-edit');},
- 'resume-record':()=>{const r=rec();view(r.entryMode==='registro'?'quick':!r.initialMoods.length?'moods':r.preparationSaved?'execute':'strategies');},
+ 'resume-record':()=>{const r=rec();if(r?.briefingAutoCreated&&!r.activityRecordOpenedAt){r.activityRecordOpenedAt=new Date().toISOString();if(!r.time&&r.date===nowLocal().date)r.time=nowLocal().time;touch(r);}view(r.entryMode==='registro'?'quick':!r.initialMoods.length?'moods':r.preparationSaved?'execute':'strategies');},
  'finish-record':()=>{const r=rec();if(r)toggleStatus(r,'finalizado');},
  'reopen-record':()=>{const r=rec();if(!r)return;r.status='andamento';touch(r);render();},
  'edit-strategy-done':()=>{},
@@ -564,11 +730,10 @@ const clickHandlers={
 document.addEventListener('click',event=>{const el=event.target.closest('[data-action]');if(!el||el.disabled)return;const fn=clickHandlers[el.dataset.action];if(fn&&el.type!=='checkbox')fn(el);});
 document.addEventListener('submit',event=>{const form=event.target;const type=form.dataset.form;if(!type)return;event.preventDefault();if(type==='quick-add'){const r=rec();if(!r)return;const text=String(new FormData(form).get('text')||'').trim();if(!text)return;const existing=quickOptions(r).find(x=>nameKey(x.text)===nameKey(text));if(existing){if(!quickChecked(r,existing))toggleQuickStrategy(existing.id);else toast('Essa estratégia já está marcada.');return;}r.strategies.push({id:uid(),sourceId:'rapido-'+uid(),text:text.slice(0,500),kind:'acao',timing:ui.quickTiming,done:true,helped:null});touch(r);ui.quickExpanded=true;render();}else if(type==='save-mood')saveMood(form);else if(type==='save-strategy')saveStrategy(form);else if(type==='historical-strategy'){const r=rec();if(!r)return;const text=String(new FormData(form).get('text')||'').trim();if(!text)return;r.strategies.push({id:uid(),sourceId:'historico-'+uid(),text,kind:'acao',timing:'agora',done:false,helped:null});touch(r);ui.addingStrategy=false;render();}else if(type==='edit-historical-strategy'){const r=rec();if(!r)return;const s=r.strategies.find(s=>s.id===form.dataset.id);const t=String(new FormData(form).get('text')||'').trim();if(!s||!t)return;s.text=t;touch(r);ui.editStrategyId=null;render();}});
 document.addEventListener('change',event=>{const el=event.target;
- if(el.id==='brief-date-picker'){if(/^\d{4}-\d{2}-\d{2}$/.test(el.value)){ui.briefDate=el.value;ui.briefTab='plan';ui.briefShowAll={};render();}return;}
+ if(el.id==='brief-date-picker'){if(/^\d{4}-\d{2}-\d{2}$/.test(el.value)){if(ui.briefEditing&&ui.briefDirty&&!window.confirm('Descartar alterações não salvas antes de mudar de data?')){el.value=ui.briefDate;return;}briefOpenDate(el.value);render();}return;}
  if(el.dataset.briefCheck){
   const aid=el.dataset.aid;
   if(el.dataset.briefCheck==='strategy'){briefStrategyToggle(aid,el.dataset.id);return;}
-  if(el.dataset.briefCheck==='done'){briefMarkDone(aid,el.dataset.id);return;}
   if(el.dataset.briefCheck==='notify'){
    const st=briefSection(aid).strategies.find(s=>s.id===el.dataset.id);
    if(st){st.notify=el.checked&&!!st.time;briefSave();render();}return;
@@ -578,7 +743,7 @@ document.addEventListener('change',event=>{const el=event.target;
   const st=briefSection(el.dataset.aid).strategies.find(s=>s.id===el.dataset.id);
   if(st){st.time=/^([01]\d|2[0-3]):[0-5]\d$/.test(el.value)?el.value:'';if(!st.time)st.notify=false;briefSave();render();}return;
  }
- if(el.dataset.briefSleep){const b=briefFor();if(!b.lastSleep)b.lastSleep={};
+ if(el.dataset.briefSleep){const b=ui.briefDraft||briefFor();if(!b.lastSleep)b.lastSleep={};
   if(el.dataset.briefSleep==='hours')b.lastSleep.hours=el.value===''?null:Math.max(0,Math.min(24,Number(el.value)||0));
   if(el.dataset.briefSleep==='quality')b.lastSleep.quality=el.value===''?null:Math.max(1,Math.min(5,Number(el.value)||1));
   briefSave();return;
@@ -603,13 +768,14 @@ historyInput.addEventListener('change',async event=>{
 const fileInput=document.getElementById('import-file');
 fileInput.addEventListener('change',async event=>{const file=event.target.files?.[0];fileInput.value='';if(!file)return;if(file.size>8*1024*1024){toast('O arquivo é grande demais para restaurar aqui.');return;}
  try{const content=JSON.parse(await file.text());if(content.type!=='backup'||content.schemaVersion!==2||!content.data)throw new Error('Este arquivo não é um backup completo compatível.');const replacement=content.data;if(replacement.schemaVersion!==2||!Array.isArray(replacement.records)||!Array.isArray(replacement.strategies)||!replacement.moods||ACTIVITIES.some(a=>!Array.isArray(replacement.moods[a.id])))throw new Error('Backup incompleto ou inválido.');if(!window.confirm('Restaurar o backup? Todos os registros e personalizações atuais serão substituídos. Recomenda-se exportar um backup antes.'))return;
- const previous=db;db=replacement;if(!db.settings||typeof db.settings!=='object')db.settings={theme:'carbono'};if(!THEME_PRESETS.some(t=>t.id===db.settings.theme))db.settings.theme='carbono';upgradeCatalogV10(db);upgradeCatalogV11(db);upgradeCatalogV12(db);upgradeCatalogV13(db);if(!persist()){db=previous;throw new Error('Não foi possível gravar os dados restaurados.');}applyTheme();ui.recordId=null;setTab('history');window.RituaisPush?.queueSync?.(db.briefings);toast('Backup restaurado.');
+ const previous=db;db=replacement;if(!db.settings||typeof db.settings!=='object')db.settings={theme:'carbono'};if(!THEME_PRESETS.some(t=>t.id===db.settings.theme))db.settings.theme='carbono';upgradeCatalogV10(db);upgradeCatalogV11(db);upgradeCatalogV12(db);upgradeCatalogV13(db);briefBackfillSavedPlans();if(!persist()){db=previous;throw new Error('Não foi possível gravar os dados restaurados.');}applyTheme();ui.recordId=null;setTab('history');window.RituaisPush?.queueSync?.(briefPushSnapshot());toast('Backup restaurado.');
  }catch(e){toast(e.message||'Não foi possível ler o backup.');}
 });
-window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY&&event.newValue){try{const fresh=JSON.parse(event.newValue);if(fresh.schemaVersion===2&&Array.isArray(fresh.records)){db=fresh;const m10=upgradeCatalogV10(db);const m11=upgradeCatalogV11(db);const m12=upgradeCatalogV12(db);const m13=upgradeCatalogV13(db);const migratedFromStorage=m10||m11||m12||m13;if(migratedFromStorage)persist();render();}}catch(e){}}});
+window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY&&event.newValue){try{const fresh=JSON.parse(event.newValue);if(fresh.schemaVersion===2&&Array.isArray(fresh.records)){db=fresh;const m10=upgradeCatalogV10(db);const m11=upgradeCatalogV11(db);const m12=upgradeCatalogV12(db);const m13=upgradeCatalogV13(db);const migratedFromStorage=m10||m11||m12||m13||briefBackfillSavedPlans();if(migratedFromStorage)persist();render();}}catch(e){}}});
+const briefingHistoryMigrated=briefBackfillSavedPlans();
 applyTheme();
-if(!storageFault && (catalogMigrated || !localStorage.getItem(STORAGE_KEY)))persist();
+if(!storageFault && (catalogMigrated || briefingHistoryMigrated || !localStorage.getItem(STORAGE_KEY)))persist();
 if(storageFault)toast('Armazenamento não disponível. Verifique as configurações do navegador.');
 render();
-try{const q=new URLSearchParams(location.search);if(q.get('briefing')==='1'){ui.briefDate=nowLocal().date;const aid=q.get('activity');if(BRIEF_IDS.includes(aid)){ui.briefOpen=aid;ui.briefShowAll[aid]='library';}ui.briefTarget=q.get('strategy');view('briefing');requestAnimationFrame(()=>{const el=[...document.querySelectorAll('[data-brief-strategy-id]')].find(x=>x.dataset.briefStrategyId===ui.briefTarget);el?.scrollIntoView({block:'center'});});history.replaceState({},'',location.pathname);}}catch(e){}
+try{const q=new URLSearchParams(location.search);if(q.get('briefing')==='1'){briefOpenDate(nowLocal().date);const aid=q.get('activity');if(BRIEF_IDS.includes(aid)){ui.briefOpen=aid;ui.briefShowAll[aid]='library';}ui.briefTarget=q.get('strategy');view('briefing');requestAnimationFrame(()=>{const el=[...document.querySelectorAll('[data-brief-strategy-id]')].find(x=>x.dataset.briefStrategyId===ui.briefTarget);el?.scrollIntoView({block:'center'});});history.replaceState({},'',location.pathname);}}catch(e){}
 })();
