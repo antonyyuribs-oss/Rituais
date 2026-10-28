@@ -5,11 +5,20 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#edf2fb",
-  "theme_color": "#1f3656",
+  "background_color": "#191B20",
+  "theme_color": "#191B20",
   "icons": [
-    {"src":"assets/rituais-icon-192-v7.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"assets/rituais-icon-512-v7.png","sizes":"512x512","type":"image/png","purpose":"any maskable"},
-    {"src":"assets/icone.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}
+    {
+      "src": "./icon-192.png?v=10",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png?v=10",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }
